@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
               console.log(result["error"]);
             }
             else {
-              // TODO
+              // TODO redirect
             }
           });
         return false;

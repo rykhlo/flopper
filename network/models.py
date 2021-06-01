@@ -25,7 +25,7 @@ class Post(models.Model):
     def serialize(self):
         return {
             "id" : self.id,
-            "author" : self.author.user.username,
+            "author" : self.author.username,
             "text" : self.text,
             "timestamp" : self.timestamp,
             "likes" : [user.username for user in self.likes.all()],
@@ -39,7 +39,7 @@ class Comment(models.Model):
     def serialize(self):
         return {
             "id" : self.id,
-            "author" : self.author.user.username,
+            "author" : self.author.username,
             "post" : self.post,
             "text" : self.text,
             "timestamp" : self.timestamp,

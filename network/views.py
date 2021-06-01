@@ -65,7 +65,7 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
-        
+
 @csrf_exempt
 @login_required(login_url='/login')
 def new_post(request):
@@ -75,9 +75,9 @@ def new_post(request):
         
     # Get contents of post
     data = json.loads(request.body)  
-    text = data.get("text", "")
+    text = data.get("text")
     # Check if new post is not empty
-    if text == [""]:
+    if text == "":
         return JsonResponse({
             "error": "New post cannot be empty"
         }, status=400)
@@ -103,5 +103,5 @@ def posts(request, post_filter):
         return JsonResponse({"error": "Invalid posts filter."}, status=400)
     #return posts in reverse chronological order
     posts = posts.order_by("-timestamp").all()
-    return JsonResponse([posts.serialize() for post in posts], safe=False)
+    return JsonResponse([post.serialize() for post in posts], safe=False)
 
