@@ -99,6 +99,10 @@ def posts(request, post_filter):
         posts = Post.objects.filter(
             #TODO
         )
+    elif post_filter == "profile":
+        posts = Post.objects.filter(
+            author=request.user,
+        )
     else:
         return JsonResponse({"error": "Invalid posts filter."}, status=400)
     #return posts in reverse chronological order

@@ -1,49 +1,40 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // Use buttons to toggle between views
-    document.querySelector('#all_posts').addEventListener('click', () => load_posts('all'));
-    document.querySelector('#following_posts').addEventListener('click', () => load_posts('following'));
-    document.querySelector('#new_post').addEventListener('click', new_post);
-  
+    document.querySelector('#all_posts_link').addEventListener('click', () => load_posts('all'));
+    document.querySelector('#following_posts_link').addEventListener('click', () => load_posts('following'));
+    document.querySelector('#profile_link').addEventListener('click', () => load_posts('profile'));
+
     // By default, load the all posts
     load_posts('all');
-  
-    function new_post() {
-        //TODO add the ability to collide the new_post form 
-        // Show correct views
-        document.querySelector('#new_post-view').style.display = 'block';
 
-        // Clear out composition fields
-        document.querySelector('#new_post-text').value = '';
-        
-        // Submit form
-        document.querySelector('#new_post-form').onsubmit = () => {   
-          fetch('/posts', {
-            method: 'POST',
-            body: JSON.stringify({
-                text: document.querySelector('#new_post-text').value,
-            })
+    // New post submit form listener 
+    document.querySelector('#new_post-submit').addEventListener('click', () => {   
+        fetch('/posts', {
+          method: 'POST',
+          body: JSON.stringify({
+              text: document.querySelector('#new_post-text').value,
           })
-          .then(response => response.json())
-          .then(result => {
-            console.log(result);
-            if (result["error"]) {
-              console.log(result["error"]);
-            }
-            else {
-              // TODO redirect
-            }
-          });
-        return false;
-        };
-    }
+        })
+        .then(response => response.json())
+        .then(result => {
+          console.log(result);
+          if (result["error"]) {
+            console.log(result["error"]);
+          }
+          else {
+            // TODO redirect
+          }
+        });
+      return false;
+      });
+  
 
     function load_posts(post_filter) {
         // clear the posts-view
         document.querySelector('#posts-view').innerHTML = ''
         // Show the posts view and hide other views
         document.querySelector('#posts-view').style.display = 'block';
-        document.querySelector('#new_post-view').style.display = 'none';
       
         // Show the posts filter
         if (post_filter === "all"){
@@ -51,6 +42,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         else if (post_filter === "following"){
             document.querySelector('#posts-view').innerHTML = '<h3>Following</h3>'        
+        }
+        else if (post_filter === "profile"){
+            document.querySelector("#posts-view").innerHTML = `<h3>My Posts</h3>`
         }
 
         fetch(`posts/${post_filter}`)
@@ -71,10 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 `;
 
-                document.querySelector("#posts-view").append(post_card);
-
-                
-                
+                document.querySelector("#posts-view").append(post_card);                
             })
 
         })

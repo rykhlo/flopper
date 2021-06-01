@@ -2,14 +2,15 @@
 {% load static %}
 
 {% block body %}
-<button class="btn btn-sm btn-outline-primary" id="new_post">New Post</button>
+{% if user.is_authenticated %}
 <div id="new_post-view">
     <h3>New Post</h3>
     <form id="new_post-form">
         <textarea class="form-control" id="new_post-text" placeholder="Type here..."></textarea>
-        <input type="submit" class="btn btn-primary"/>
+        <input type="submit" class="btn btn-primary" id="new_post-submit"/>
     </form>
 </div>
+{% endif %}
 
 <div id="posts-view">
 </div>
