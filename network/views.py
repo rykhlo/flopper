@@ -90,7 +90,6 @@ def new_post(request):
     post.save()
     return JsonResponse({"message": "New post created successfully."}, status=201)
 
-@login_required(login_url='/login')
 def posts(request, post_filter):
     #filter posts
     if post_filter == "all":

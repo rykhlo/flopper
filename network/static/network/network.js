@@ -1,33 +1,42 @@
 document.addEventListener('DOMContentLoaded', function() {
-
-    // Use buttons to toggle between views
-    document.querySelector('#all_posts_link').addEventListener('click', () => load_posts('all'));
-    document.querySelector('#following_posts_link').addEventListener('click', () => load_posts('following'));
-    document.querySelector('#profile_link').addEventListener('click', () => load_posts('profile'));
-
+    //store user's username
+    var username = "";
     // By default, load the all posts
     load_posts('all');
+    // True if user is logged in
+    var isAuthenticated = document.querySelector('#profile-link') !== null;
+
+    // Use buttons to toggle between views
+    document.querySelector('#all_posts-link').addEventListener('click', () => load_posts('all'));
+    //check if user if logged in
+    if (isAuthenticated){
+        username = document.querySelector('#profile-link').innerText;
+        document.querySelector('#following_posts-link').addEventListener('click', () => load_posts('following'));
+        document.querySelector('#profile-link').addEventListener('click', () => load_posts('profile'));    
+    }
 
     // New post submit form listener 
-    document.querySelector('#new_post-submit').addEventListener('click', () => {   
-        fetch('/posts', {
-          method: 'POST',
-          body: JSON.stringify({
-              text: document.querySelector('#new_post-text').value,
-          })
-        })
-        .then(response => response.json())
-        .then(result => {
-          console.log(result);
-          if (result["error"]) {
-            console.log(result["error"]);
-          }
-          else {
-            // TODO redirect
-          }
+    if (isAuthenticated){
+        document.querySelector('#new_post-submit').addEventListener('click', () => {   
+            fetch('/posts', {
+            method: 'POST',
+            body: JSON.stringify({
+                text: document.querySelector('#new_post-text').value,
+            })
+            })
+            .then(response => response.json())
+            .then(result => {
+            console.log(result);
+            if (result["error"]) {
+                console.log(result["error"]);
+            }
+            else {
+                // TODO redirect
+            }
+            });
+        return false;
         });
-      return false;
-      });
+    }
   
 
     function load_posts(post_filter) {
@@ -35,7 +44,13 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('#posts-view').innerHTML = ''
         // Show the posts view and hide other views
         document.querySelector('#posts-view').style.display = 'block';
-      
+        
+        if (isAuthenticated && post_filter === "all"){
+            document.querySelector('#new_post-view').style.display = 'block';
+        } else if (isAuthenticated){
+            document.querySelector('#new_post-view').style.display = 'none';
+        }
+
         // Show the posts filter
         if (post_filter === "all"){
             document.querySelector('#posts-view').innerHTML = '<h3>All Posts</h3>'
@@ -44,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('#posts-view').innerHTML = '<h3>Following</h3>'        
         }
         else if (post_filter === "profile"){
-            document.querySelector("#posts-view").innerHTML = `<h3>My Posts</h3>`
+            document.querySelector("#posts-view").innerHTML = `<h3> ${username}'s Posts</h3>`
         }
 
         fetch(`posts/${post_filter}`)
