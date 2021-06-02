@@ -45,6 +45,13 @@ def register(request):
         username = request.POST["username"]
         email = request.POST["email"]
 
+        # Do not allow usernames that would interfer with the API
+        prohibited_usernames = ["all", "following", "profile"]
+        if username in prohibited_usernames:
+            return render(request, "network/register.html", {
+                "message": "You cannot choose this username"
+            })
+
         # Ensure password matches confirmation
         password = request.POST["password"]
         confirmation = request.POST["confirmation"]
@@ -57,6 +64,8 @@ def register(request):
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
+            profile = Profile.objects.create(user=user)
+            profile.save()
         except IntegrityError:
             return render(request, "network/register.html", {
                 "message": "Username already taken."
@@ -90,21 +99,46 @@ def new_post(request):
     post.save()
     return JsonResponse({"message": "New post created successfully."}, status=201)
 
+@csrf_exempt
 def posts(request, post_filter):
-    #filter posts
+    # Load all posts
     if post_filter == "all":
         posts = Post.objects.all()
+    # Load posts of profiles that user follows
     elif post_filter == "following":
         posts = Post.objects.filter(
             #TODO
         )
+    # Load posts of the user
     elif post_filter == "profile":
         posts = Post.objects.filter(
             author=request.user,
         )
-    else:
-        return JsonResponse({"error": "Invalid posts filter."}, status=400)
+    else: #load posts of a profile with username post_filter
+        try:
+            user = User.objects.get(username=post_filter)
+            posts = Post.objects.filter(
+                author=user,
+            )
+        except User.DoesNotExist:
+            return JsonResponse({"error": "Invalid username."}, status=400)
+
     #return posts in reverse chronological order
     posts = posts.order_by("-timestamp").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
+@csrf_exempt
+@login_required(login_url='/login')
+def profile(request, username):
+    #try to load user from the database
+    try:
+        user = User.objects.get(username=username)
+        profile = Profile.objects.get(user=user)
+    except User.DoesNotExist or Profile.DoesNotExist:
+        return JsonResponse({"error": f"Invalid User with username ({username})"}, status=400)
+    
+    #return object with profile info
+    return JsonResponse(profile.serialize())
+
+    
+        
