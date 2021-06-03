@@ -46,7 +46,7 @@ def register(request):
         email = request.POST["email"]
 
         # Do not allow usernames that would interfer with the API
-        prohibited_usernames = ["all", "following", "profile"]
+        prohibited_usernames = ["all", "following",]
         if username in prohibited_usernames:
             return render(request, "network/register.html", {
                 "message": "You cannot choose this username"
@@ -106,9 +106,14 @@ def posts(request, post_filter):
         posts = Post.objects.all()
     # Load posts of profiles that user follows
     elif post_filter == "following":
-        posts = Post.objects.filter(
-            #TODO
-        )
+        try:
+            user = User.objects.get(username=request.user.username)
+            profile = Profile.objects.get(user=user)
+            posts = Post.objects.filter(
+                author__in=profile.following.all(),
+            )
+        except User.DoesNotExist:
+            return JsonResponse({"error": "Invalid User."}, status=400)
     else: #load posts of a profile with username post_filter
         try:
             user = User.objects.get(username=post_filter)
@@ -116,7 +121,7 @@ def posts(request, post_filter):
                 author=user,
             )
         except User.DoesNotExist:
-            return JsonResponse({"error": "Invalid username."}, status=400)
+            return JsonResponse({"error": "Invalid User."}, status=400)
 
     #return posts in reverse chronological order
     posts = posts.order_by("-timestamp").all()
