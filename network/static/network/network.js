@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function generate_post_card(post){
 
-        
         const post_card = document.createElement('div');
         post_card.setAttribute("class", "wrapper");
         post_card.setAttribute("id", "post-card");
@@ -111,45 +110,31 @@ document.addEventListener('DOMContentLoaded', function() {
         const post_card_username = post_card.getElementsByClassName("card__meta__username")[0]
         const post_card_timestamp = post_card.getElementsByClassName("card__meta__timestamp")[0]
         const post_card_text = post_card.getElementsByClassName("card__body")[0]
+        post_card_displayname.addEventListener('click', () => load_profile(post.author))
+        post_card_username.addEventListener('click', () => load_profile(post.author))
+        post_card.addEventListener('click', () => load_post(post.id))
         post_card_displayname.innerHTML = `${post.author}`;
         post_card_username.innerHTML = `@${post.author}`;
         post_card_timestamp.innerHTML = `${post.timestamp}`;
         post_card_text.innerHTML = `${post.text}`;
-
-        console.log(post_card_text)
-        //$('#post-card').find('.card__meta__displayname').html(`${post.author}`);
-        
-        const post_modal = document.createElement('div')
-        Object.assign(post_modal, {
-            className: 'modal fade',
-            id: 'exampleModal',
-            tabindex: '-1',
-        })
-        post_modal.setAttribute("aria-labelledby", "exampleModalLabel");
-        post_modal.setAttribute("aria-hidden", "true");
-        post_modal.innerHTML = `
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        ...
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
-                    </div>
-                </div>
-            </div> 
-        `;
-
-        [post_modal]
-            .forEach(element => post_card.appendChild(element));
-        
-        $('.modal-body').html(post_card);
         
         document.querySelector("#posts-view").append(post_card);     
     }
 
+    function load_post(post_id) {
+        // clear the posts-view
+        document.querySelector('#posts-view').innerHTML = '';
+        if (isAuthenticated){
+            document.querySelector('#new_post-view').style.display = 'none';
+        }
+        // Fetch post 
+        fetch(`post/${post_id}`)
+        .then(response => response.json())
+        .then(post => {
+            generate_post_card(post);                  
+        })
 
+    }
     function load_profile(profile) {
         // clear the profile-view
         document.querySelector('#profile-view').innerHTML = ''
