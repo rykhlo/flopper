@@ -68,34 +68,56 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function generate_post_card(post){
-        const post_card = document.createElement('div')
-        post_card.setAttribute("class", "card")
-        post_card.setAttribute("style", "width: 18rem;")
 
-        const post_author = document.createElement("h5");
-        post_author.setAttribute("class", "card-title");
-        //post_author.className = ("card-title");
-        post_author.innerHTML = `${post.author} <hr>`
-        post_author.addEventListener('click', () => load_profile(post.author))
+        
+        const post_card = document.createElement('div');
+        post_card.setAttribute("class", "wrapper");
+        post_card.setAttribute("id", "post-card");
+        // Taken from https://codepen.io/markbaker/pen/QWbQVKo
+        post_card.innerHTML = `
+            <ul class="cards__list">
+                <li class="card">
+                    <div class="card__header">
+                        <img class="card__profile-img" src="https://www.syfy.com/sites/syfy/files/styles/1200x680/public/syfywire_cover_media/2018/09/c-3po-see-threepio_68fe125c.jpg" alt="c3po"/>
+                    <div class="card__meta">
+                        <div class="card__meta__displayname">
+                        C-3PO
+                        </div>
+                        <div class="card__meta__username">
+                        @humancyborgrelations
+                        </div>
+                        <div class="card__meta__timestamp">
+                        1 day ago
+                        </div>
+                    </div>
+                    </div>
+                    <div class="card__body">
+                        I have a bad feeling about this!
+                    </div>
+                    <div class="card__footer">
+                        <span class="card__footer__like">
+                        <i class="far fa-heart"></i> 13
+                        </span>
+                        <span class="card__footer__comment">
+                        <i class="far fa-comment"></i> 2
+                        </span>
+                        <span class="card__footer__share">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                </li>
+            </ul>
+        `;
+        const post_card_displayname = post_card.getElementsByClassName("card__meta__displayname")[0]
+        const post_card_username = post_card.getElementsByClassName("card__meta__username")[0]
+        const post_card_timestamp = post_card.getElementsByClassName("card__meta__timestamp")[0]
+        const post_card_text = post_card.getElementsByClassName("card__body")[0]
+        post_card_displayname.innerHTML = `${post.author}`;
+        post_card_username.innerHTML = `@${post.author}`;
+        post_card_timestamp.innerHTML = `${post.timestamp}`;
+        post_card_text.innerHTML = `${post.text}`;
 
-        const post_text = document.createElement("p");
-        Object.assign(post_text, {
-            className: 'card-text',
-        })
-        post_text.innerHTML = `${post.text}`;
-        post_text.addEventListener('click', () => $('#exampleModal').modal('show'));
-
-        const post_timestamp = document.createElement("p");
-        //post_timestamp.className = ("card-text");
-        post_timestamp.setAttribute("class", "card-text");
-        post_timestamp.innerHTML = `<small class="text-muted"> ${post.timestamp} </small></p>`
-
-        const post_likes = document.createElement("div");
-        post_likes.innerHTML = `likes TODO`;
-
-        const post_edit = document.createElement("div");
-        post_edit.innerHTML = `edit TODO`;
-
+        console.log(post_card_text)
+        //$('#post-card').find('.card__meta__displayname').html(`${post.author}`);
         
         const post_modal = document.createElement('div')
         Object.assign(post_modal, {
@@ -118,8 +140,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div> 
         `;
-        
-        [post_author, post_text, post_timestamp, post_likes, post_edit, post_modal]
+
+        [post_modal]
             .forEach(element => post_card.appendChild(element));
         
         $('.modal-body').html(post_card);

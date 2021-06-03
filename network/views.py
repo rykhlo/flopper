@@ -127,6 +127,16 @@ def posts(request, post_filter):
     posts = posts.order_by("-timestamp").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
+def post(request, post_id):
+    # Fetch post only with GET method
+    if request.method != "GET":
+        return JsonResponse({"error": "GET request required."}, status=400)
+    try:
+        post = Post.objects.get(pk=post_id)
+    except Post.DoesNotExist:
+        return JsonResponse({"error": "Invalid Post ID."}, status=400) 
+    return JsonResponse(post.serialize())
+
 @csrf_exempt
 @login_required(login_url='/login')
 def profile(request, username):
