@@ -1,21 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
     //store user's username
     var username = "";
-    // By default, load the all posts
-    load_posts('all');
     // True if user is logged in
     var isAuthenticated = document.querySelector('#profile-link') !== null;
 
-    // Use buttons to toggle between views
+    // By default, load the all posts. Add listeners depending on whether the user is logged in
+    load_posts('all');
     document.querySelector('#all_posts-link').addEventListener('click', () => load_posts('all'));
-    //check if user if logged in
     if (isAuthenticated){
         username = document.querySelector('#profile-link').innerText;
         document.querySelector('#following_posts-link').addEventListener('click', () => load_posts('following'));
         document.querySelector('#profile-link').addEventListener('click', () => load_profile(username));    
     }
-
-    // New post submit form listener 
+    // New post submit form 
     if (isAuthenticated){
         document.querySelector('#new_post-submit').addEventListener('click', () => {   
             fetch('/posts', {
@@ -97,16 +94,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const post_edit = document.createElement("div");
         post_edit.innerHTML = `edit TODO`;
 
-        // post_card.innerHTML = `
-        // <div class="card-body">
-        //     <h5 class="card-title">${post.author}</h5>
-        //     <p class="card-text">${post.text}</p>
-        //     <p class="card-text"><small class="text-muted"> ${post.timestamp} </small></p>
-        //     <a href="#" class="card-link">Like TODO</a>
-        //     <a href="#" class="card-link">Edit TODO</a>
-        // </div>
-        // `;
-
         [post_author, post_text, post_timestamp, post_likes, post_edit]
             .forEach(element => post_card.appendChild(element));
         
@@ -137,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const follow_button = document.createElement("button");
                 follow_button.className = "btn btn-outline-secondary";
                 follow_button.innerHTML = `${data.followers.includes(username) ? "Unfollow" : "Follow"}`
-                follow_button.onclick = () => put_follower(username, data.username);
+                follow_button.onclick = () => follow(profile);
                 document.getElementById('profile-view').appendChild(follow_button);
             }
 
@@ -151,15 +138,19 @@ document.addEventListener('DOMContentLoaded', function() {
         })      
     }
 
-    // make whom be a follower of where
-    function put_follower(whom, where){
-        console.log("follower time")
-        fetch(`/profile/${where}`, {
+    // Follow/Unfollow selected user
+    function follow(username){
+        fetch(`/follow/${username}`, {
             method: 'PUT',
-            body: JSON.stringify({
-                followers: [whom],
-            }),
         })
+        .then(response => response.json())
+            .then(result => {
+            console.log(result);
+            })
+        setTimeout(() => {
+            load_profile(username)
+        }, 250);
+        return false;
     }
   
 });

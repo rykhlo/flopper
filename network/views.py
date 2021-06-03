@@ -139,9 +139,9 @@ def profile(request, username):
 @csrf_exempt
 @login_required(login_url='/login')
 def follow(request,username):
-    # Only accepts POST requests
-    # if request.method != "POST":
-    #     return JsonResponse({"error": "POST request required."}, status=400)
+    #Only accepts PUT requests
+    if request.method != "PUT":
+        return JsonResponse({"error": "PUT request required."}, status=400)
 
     # Load the user and profile of the account who sent the follow request
     try:
