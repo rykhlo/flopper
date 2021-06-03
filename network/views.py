@@ -109,11 +109,6 @@ def posts(request, post_filter):
         posts = Post.objects.filter(
             #TODO
         )
-    # Load posts of the user
-    elif post_filter == "profile":
-        posts = Post.objects.filter(
-            author=request.user,
-        )
     else: #load posts of a profile with username post_filter
         try:
             user = User.objects.get(username=post_filter)
@@ -141,4 +136,41 @@ def profile(request, username):
     return JsonResponse(profile.serialize())
 
     
-        
+@csrf_exempt
+@login_required(login_url='/login')
+def follow(request,username):
+    # Only accepts POST requests
+    # if request.method != "POST":
+    #     return JsonResponse({"error": "POST request required."}, status=400)
+
+    # Load the user and profile of the account who sent the follow request
+    try:
+        follows_user = User.objects.get(username=request.user.username)
+        follows_profile = Profile.objects.get(user=follows_user)
+    except User.DoesNotExist or Profile.DoesNotExist:
+        return JsonResponse({"error": "Request user is not valid"}, status=400)       
+
+    # Load the user and profile of the account that is being followed 
+    try:
+        followed_user = User.objects.get(username=username)
+        followed_profile = Profile.objects.get(user=followed_user)
+    except User.DoesNotExist or Profile.DoesNotExist:
+        return JsonResponse({"error": f"Unable to follow user {username}. Invalid profile."}, status=400)
+    
+    # If follower already exists, remove the follower
+    message = ""
+    if followed_user in follows_profile.following.all() or follows_user in followed_profile.followers.all():
+        follows_profile.following.remove(followed_user)
+        followed_profile.followers.remove(follows_user)
+        message = "Follower removed successfully"
+    else: #if follower does not exist, add the follower
+        follows_profile.following.add(followed_user)
+        followed_profile.followers.add(follows_user)
+        message = "Follower added successfully"
+    follows_profile.save()
+    followed_profile.save()
+    return JsonResponse({"message": message}, status=201)
+
+
+
+

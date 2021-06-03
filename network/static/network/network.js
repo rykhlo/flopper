@@ -59,12 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('#profile-view').style.display = 'none';
             document.querySelector('#posts-view').innerHTML = '<h3>Following</h3>'        
         }
-        else if (post_filter === "profile"){
-            // const user_posts_title = document.createElement("h3");
-            // user_posts_title.innerHTML = `<h3> ${username}'s Posts</h3>`;
-            // document.querySelector("#posts-view").append(user_posts_title);
-            document.querySelector('#posts-view').innerHTML = `<h3> ${username}'s Posts</h3>`;      
-        }
 
         // Fetch posts based on filter
         fetch(`posts/${post_filter}`)
