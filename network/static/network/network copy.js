@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const post_edit = document.createElement("div");
         post_edit.innerHTML = `edit TODO`;
 
-        
+        /// POST MODAL ///
         const post_modal = document.createElement('div')
         Object.assign(post_modal, {
             className: 'modal fade',
@@ -105,28 +105,51 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         post_modal.setAttribute("aria-labelledby", "exampleModalLabel");
         post_modal.setAttribute("aria-hidden", "true");
-        post_modal.innerHTML = `
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        ...
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
-                    </div>
-                </div>
-            </div> 
-        `;
+
+        const post_modal_dialog = document.createElement('div');
+        Object.assign(post_modal_dialog, {
+            className: 'modal-dialog',
+        })
+
+        const post_modal_content = document.createElement('div');
+        Object.assign(post_modal_content, {
+            className: 'modal-content',
+        })
+
+        const post_modal_header= document.createElement('div');
+        Object.assign(post_modal_header, {
+            className: 'modal-header',
+        })
+        post_modal_header.innerHTML = `<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>`
+
+        const post_modal_body = document.createElement('div');
+        Object.assign(post_modal_body, {
+            className: 'card',
+        })
+        $('#exampleModal').on('shown.bs.modal', function() {
+            $('#exampleModal').find('.modal-body').append('<p>append some html here</p>');
+        });
         
+
+        const post_modal_footer= document.createElement('div');
+        Object.assign(post_modal_footer, {
+            className: 'modal-footer',
+        })
+        post_modal_footer.innerHTML = `
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>`;
+        
+
+        [post_modal_header, post_modal_body, post_modal_footer]
+            .forEach(element => post_modal_content.appendChild(element));
+        post_modal_dialog.appendChild(post_modal_content);
+        post_modal.appendChild(post_modal_dialog);
+
         [post_author, post_text, post_timestamp, post_likes, post_edit, post_modal]
             .forEach(element => post_card.appendChild(element));
         
-        $('.modal-body').html(post_card);
-        
         document.querySelector("#posts-view").append(post_card);     
     }
-
 
     function load_profile(profile) {
         // clear the profile-view
