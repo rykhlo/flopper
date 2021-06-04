@@ -1,85 +1,127 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
     //store user's username
     var username = "";
+    var current_page = 1;
     // True if user is logged in
-    var isAuthenticated = document.querySelector('#profile-link') !== null;
+    var isAuthenticated = document.querySelector("#profile-link") !== null;
+
+    window.onpopstate = function (event) {
+        showSection(event.state.section);
+    };
+    function showSection(section) {
+        console.log(section.slice(0, 2));
+        if (section === "all" || "following") {
+            load_posts(`${section}`);
+        } else {
+            load_profile(`${section}`);
+        }
+    }
 
     // By default, load the all posts. Add listeners depending on whether the user is logged in
-    load_posts('all');
-    document.querySelector('#all_posts-link').addEventListener('click', () => load_posts('all'));
-    if (isAuthenticated){
-        username = document.querySelector('#profile-link').innerText;
-        document.querySelector('#following_posts-link').addEventListener('click', () => load_posts('following'));
-        document.querySelector('#profile-link').addEventListener('click', () => load_profile(username));    
-    }
-    // New post submit form 
-    if (isAuthenticated){
-        document.querySelector('#new_post-submit').addEventListener('click', () => {   
-            fetch('/posts', {
-            method: 'POST',
-            body: JSON.stringify({
-                text: document.querySelector('#new_post-text').value,
-            })
-            })
-            .then(response => response.json())
-            .then(result => {
-            console.log(result);
-            if (result["error"]) {
-                console.log(result["error"]);
-            }
-            else {
-                // TODO redirect
-            }
-            });
-        return false;
+    //history.pushState({section: "all"}, "", `all`);
+    load_posts("all");
+    document
+        .querySelector("#all_posts-link")
+        .addEventListener("click", function () {
+            const section = this.dataset.section;
+            //history.pushState({section: section}, "", `${section}`);
+            load_posts("all");
         });
+
+    if (isAuthenticated) {
+        username = document.querySelector("#profile-link").innerText;
+        document
+            .querySelector("#following_posts-link")
+            .addEventListener("click", function () {
+                const section = this.dataset.section;
+                //history.pushState({section: section}, "", `${section}`);
+                load_posts("following");
+            });
+
+        document
+            .querySelector("#profile-link")
+            .setAttribute("data-section", `${username}`);
+        document
+            .querySelector("#profile-link")
+            .addEventListener("click", function () {
+                const section = this.dataset.section;
+                //history.pushState({section: section}, "", `${section}`);
+                load_profile(username);
+            });
+    }
+    // New post submit form
+    if (isAuthenticated) {
+        document
+            .querySelector("#new_post-submit")
+            .addEventListener("click", () => {
+                fetch("/posts", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        text: document.querySelector("#new_post-text").value,
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then((result) => {
+                        console.log(result);
+                        if (result["error"]) {
+                            console.log(result["error"]);
+                        } else {
+                            // TODO redirect
+                        }
+                    });
+                return false;
+            });
     }
 
     function load_posts(post_filter) {
         // clear the posts-view
-        document.querySelector('#posts-view').innerHTML = ''
+        document.querySelector("#posts-view").innerHTML = "";
 
         // Display New Post form only for authenticated users in all posts tab
-        document.querySelector('#posts-view').style.display = 'block';
-        if (isAuthenticated && post_filter === "all"){
-            document.querySelector('#new_post-view').style.display = 'block';
-        } else if (isAuthenticated){
-            document.querySelector('#new_post-view').style.display = 'none';
+        document.querySelector("#posts-view").style.display = "block";
+        if (isAuthenticated && post_filter === "all") {
+            document.querySelector("#new_post-view").style.display = "block";
+        } else if (isAuthenticated) {
+            document.querySelector("#new_post-view").style.display = "none";
         }
 
-        // Show the title 
-        if (post_filter === "all"){
-            document.querySelector('#profile-view').style.display = 'none';
-            document.querySelector('#posts-view').innerHTML = '<h3>All Posts</h3>'
-        }
-        else if (post_filter === "following"){
-            document.querySelector('#profile-view').style.display = 'none';
-            document.querySelector('#posts-view').innerHTML = '<h3>Following</h3>'        
+        // Show the title
+        if (post_filter === "all") {
+            document.querySelector("#profile-view").style.display = "none";
+            document.querySelector("#posts-view").innerHTML =
+                "<h3>All Posts</h3>";
+        } else if (post_filter === "following") {
+            document.querySelector("#profile-view").style.display = "none";
+            document.querySelector("#posts-view").innerHTML =
+                "<h3>Following</h3>";
         }
 
         // Fetch posts based on filter
-        fetch(`posts/${post_filter}`)
-        .then(response => response.json())
-        .then(posts => {
-            posts.forEach(post => { 
-                generate_post_card(post);                  
-            })
-        })
+
+        fetch(`posts/${post_filter}?page=${current_page}`)
+            .then((response) => response.json())
+            .then((data) => {
+                posts = data["posts"];
+                posts.forEach((post) => {
+                    generate_post_card(post);
+                });
+                const pagination = generate_pagination(data, post_filter);
+                document.querySelector("#posts-view").append(pagination);
+            });
     }
 
-    function generate_post_card(post){
-
-        const post_card = document.createElement('div');
+    function generate_post_card(post) {
+        const post_card = document.createElement("div");
         post_card.setAttribute("class", "wrapper");
         post_card.setAttribute("id", "post-card");
         // Taken from https://codepen.io/markbaker/pen/QWbQVKo
         post_card.innerHTML = `
             <ul class="cards__list">
-                <li class="card">
+                <li class="card hvr-fade">
                     <div class="card__header">
                         <img class="card__profile-img" src="https://www.syfy.com/sites/syfy/files/styles/1200x680/public/syfywire_cover_media/2018/09/c-3po-see-threepio_68fe125c.jpg" alt="c3po"/>
                     <div class="card__meta">
-                        <div class="card__meta__displayname">
+                        <div class="card__meta__displayname ">
                         C-3PO
                         </div>
                         <div class="card__meta__username">
@@ -106,86 +148,262 @@ document.addEventListener('DOMContentLoaded', function() {
                 </li>
             </ul>
         `;
-        const post_card_displayname = post_card.getElementsByClassName("card__meta__displayname")[0]
-        const post_card_username = post_card.getElementsByClassName("card__meta__username")[0]
-        const post_card_timestamp = post_card.getElementsByClassName("card__meta__timestamp")[0]
-        const post_card_text = post_card.getElementsByClassName("card__body")[0]
-        post_card_displayname.addEventListener('click', () => load_profile(post.author))
-        post_card_username.addEventListener('click', () => load_profile(post.author))
-        post_card.addEventListener('click', () => load_post(post.id))
+        const post_card_displayname = post_card.getElementsByClassName(
+            "card__meta__displayname"
+        )[0];
+        const post_card_username = post_card.getElementsByClassName(
+            "card__meta__username"
+        )[0];
+        const post_card_timestamp = post_card.getElementsByClassName(
+            "card__meta__timestamp"
+        )[0];
+        const post_card_text =
+            post_card.getElementsByClassName("card__body")[0];
+        post_card_displayname.setAttribute("data-section", `u/${post.author}`);
+        post_card_displayname.addEventListener("click", function () {
+            const section = post_card_displayname.dataset.section;
+            //history.pushState({section: section}, "", `${section}`);
+            load_profile(post.author);
+        });
+        post_card.addEventListener("click", () => load_post(post.id));
         post_card_displayname.innerHTML = `${post.author}`;
         post_card_username.innerHTML = `@${post.author}`;
         post_card_timestamp.innerHTML = `${post.timestamp}`;
         post_card_text.innerHTML = `${post.text}`;
-        
-        document.querySelector("#posts-view").append(post_card);     
+
+        document.querySelector("#posts-view").append(post_card);
     }
 
     function load_post(post_id) {
-        // clear the posts-view
-        document.querySelector('#posts-view').innerHTML = '';
-        if (isAuthenticated){
-            document.querySelector('#new_post-view').style.display = 'none';
+        // clear views
+        document.querySelector("#profile-view").innerHTML = "";
+        document.querySelector("#posts-view").innerHTML = "";
+        if (isAuthenticated) {
+            document.querySelector("#new_post-view").style.display = "none";
         }
-        // Fetch post 
+        // Fetch post
         fetch(`post/${post_id}`)
-        .then(response => response.json())
-        .then(post => {
-            generate_post_card(post);                  
-        })
-
+            .then((response) => response.json())
+            .then((post) => {
+                generate_post_card(post);
+            });
     }
     function load_profile(profile) {
         // clear the profile-view
-        document.querySelector('#profile-view').innerHTML = ''
-        document.querySelector('#profile-view').style.display = 'block';
+        document.querySelector("#profile-view").innerHTML = "";
+        document.querySelector("#profile-view").style.display = "block";
 
         fetch(`/profile/${profile}`)
-        .then(response => response.json())
-        .then(data => {
-            // Create a card that displays followers info
-            const followers_card = document.createElement("div");
-            followers_card.setAttribute("class", "card");
-            followers_card.setAttribute("style", "width: 18rem;");
-            followers_card.innerHTML = `
+            .then((response) => response.json())
+            .then((data) => {
+                // Create a card that displays followers info
+                const followers_card = document.createElement("div");
+                followers_card.setAttribute("class", "card");
+                followers_card.setAttribute("style", "width: 18rem;");
+                followers_card.innerHTML = `
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><strong>${data.username}</strong></li>
                     <li class="list-group-item">Followers: ${data.followers.length}</li>
                     <li class="list-group-item">Following: ${data.following.length}</li>
                 </ul>
             `;
-            // Display follow button if profile is not user's
-            if (username != profile){
-                const follow_button = document.createElement("button");
-                follow_button.className = "btn btn-outline-secondary";
-                follow_button.innerHTML = `${data.followers.includes(username) ? "Unfollow" : "Follow"}`
-                follow_button.onclick = () => follow(profile);
-                document.getElementById('profile-view').appendChild(follow_button);
-            }
+                // Display follow button if profile is not user's
+                if (username != profile) {
+                    const follow_button = document.createElement("button");
+                    follow_button.className = "btn btn-outline-secondary";
+                    follow_button.innerHTML = `${
+                        data.followers.includes(username)
+                            ? "Unfollow"
+                            : "Follow"
+                    }`;
+                    follow_button.onclick = () => follow(profile);
+                    document
+                        .getElementById("profile-view")
+                        .appendChild(follow_button);
+                }
 
-            document.querySelector("#profile-view").append(followers_card); 
-            // Add title for posts
-            const user_posts_title = document.createElement("h3");
-            user_posts_title.innerHTML = `<h3> ${profile}'s Posts</h3>`;
-            document.querySelector("#profile-view").append(user_posts_title);
-            // Load posts of the specified profile
-            load_posts(profile);
-        })      
+                document.querySelector("#profile-view").append(followers_card);
+                // Add title for posts
+                const user_posts_title = document.createElement("h3");
+                user_posts_title.innerHTML = `<h3> ${profile}'s Posts</h3>`;
+                document
+                    .querySelector("#profile-view")
+                    .append(user_posts_title);
+                // Load posts of the specified profile
+                load_posts(profile);
+            });
     }
 
     // Follow/Unfollow selected user
-    function follow(username){
+    function follow(username) {
         fetch(`/follow/${username}`, {
-            method: 'PUT',
+            method: "PUT",
         })
-        .then(response => response.json())
-            .then(result => {
-            console.log(result);
-            })
+            .then((response) => response.json())
+            .then((result) => {
+                console.log(result);
+            });
         setTimeout(() => {
-            load_profile(username)
+            load_profile(username);
         }, 250);
         return false;
     }
-  
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("button").forEach((button) => {
+            button.onclick = function () {
+                const section = this.dataset.section;
+                //history.pushState({section: section}, "", `section${section}`);
+                showSection(section);
+            };
+        });
+    });
+    function generate_pagination(data, post_filter) {
+        // Pagination taken from https://codepen.io/fadzrinmadu/pen/KKWvYqW
+        const pagination = document.createElement("div");
+        pagination.setAttribute("class", "pagination");
+        // selecting required element
+        const pagination_ul = document.createElement("ul");
+    
+        let totalPages = data["num_pages"];
+        let page = current_page;
+    
+        let liTag = "";
+        let active;
+        let beforePage = page - 1;
+        let afterPage = page + 1;
+        if (page > 1) {
+            //show the next button if the page value is greater than 1
+            liTag += `<li class="btn prev"><span><i class="fas fa-angle-left"></i> Prev</span></li>`;
+        }
+        if (page > 1) {
+            //if page value is less than 2 then add 1 after the previous button
+            liTag += `<li class="first numb""><span>1</span></li>`;
+            if (page > 3) {
+                //if page value is greater than 3 then add this (...) after the first li or page
+                liTag += `<li class="dots"><span>...</span></li>`;
+            }
+        }
+        // how many pages or li show before the current li
+        if (page == totalPages) {
+            beforePage = beforePage - 2;
+        } else if (page == totalPages - 1) {
+            beforePage = beforePage - 1;
+        }
+        // how many pages or li show after the current li
+        if (page == 1) {
+            afterPage = afterPage + 2;
+        } else if (page == 2) {
+            afterPage = afterPage + 1;
+        }
+
+        for (var plength = beforePage; plength <= afterPage; plength++) {
+            if (plength > totalPages) {
+                //if plength is greater than totalPage length then continue
+                continue;
+            }
+            if (plength == 0 || plength == 1) {
+                //if plength is 0 than add +1 in plength value
+                plength = plength + 1;
+            }
+            if (page == plength) {
+                //if page is equal to plength than assign active string in the active variable
+                active = "active";
+            } else {
+                //else leave empty to the active variable
+                active = "";
+            }
+            liTag += `<li class="numb ${plength}"><span>${plength}</span></li>`;
+        }
+
+        if (page < totalPages - 1) {
+            //if page value is less than totalPage value by -1 then show the last li or page
+            if (page < totalPages - 2) {
+                //if page value is less than totalPage value by -2 then add this (...) before the last li or page
+                liTag += `<li class="dots"><span>...</span></li>`;
+            }
+            liTag += `<li class="last numb"><span>${totalPages}</span></li>`;
+        }
+
+        if (page < totalPages) {
+            //show the next button if the page value is less than totalPage(20)
+            liTag += `<li class="btn next"><span>Next <i class="fas fa-angle-right"></i></span></li>`;
+        }
+        pagination_ul.innerHTML = liTag; //add li tag inside ul tag
+        pagination.appendChild(pagination_ul);
+
+        const active_num = pagination.getElementsByClassName(
+            `${current_page}`
+        )[0];
+        active_num.setAttribute("class", "numb active");
+
+        const btn_next = pagination.getElementsByClassName(
+            "btn next"
+        )[0];
+        if (btn_next){
+            btn_next.addEventListener("click", function () {
+                current_page++
+                console.log(current_page)
+                load_posts(post_filter)
+            });
+        }
+        const btn_prev = pagination.getElementsByClassName(
+            "btn prev"
+        )[0];
+        if (btn_prev){
+            btn_prev.addEventListener("click", function () {
+                current_page--
+                console.log(current_page)
+                load_posts(post_filter)
+            });
+        }
+        const first_numb = pagination.getElementsByClassName(
+            "first numb"
+        )[0];
+        if (first_numb){
+            first_numb.addEventListener("click", function () {
+                current_page = 1
+                console.log(current_page)
+                load_posts(post_filter)
+            });
+        }
+        const last_numb = pagination.getElementsByClassName(
+            "last numb"
+        )[0];
+        if (last_numb){
+            last_numb.addEventListener("click", function () {
+                current_page = totalPages
+                console.log(current_page)
+                load_posts(post_filter)
+            });
+        }
+        for (let i = 1; i < 4; i++){
+            const plus_numb = pagination.getElementsByClassName(
+                `numb ${current_page + i}`
+            )[0];
+            if (plus_numb){
+                plus_numb.addEventListener("click", function () {
+                    current_page = current_page + i
+                    console.log(current_page)
+                    load_posts(post_filter)
+                });
+            }
+        }
+        for (let i = current_page; i > current_page - 4; i--){
+            const minus_numb = pagination.getElementsByClassName(
+                `numb ${i}`
+            )[0];
+            if (minus_numb){
+                minus_numb.addEventListener("click", function () {
+                    current_page = i
+                    console.log(current_page)
+                    load_posts(post_filter)
+                });
+            }
+        }  
+        return pagination
+
+    }
 });
+
+

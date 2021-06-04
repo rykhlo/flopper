@@ -5,6 +5,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.core.paginator import Paginator, EmptyPage
 
 #TODO remove csrf_exempt and implement csrf tokens
 from django.views.decorators.csrf import csrf_exempt 
@@ -125,7 +126,18 @@ def posts(request, post_filter):
 
     #return posts in reverse chronological order
     posts = posts.order_by("-timestamp").all()
-    return JsonResponse([post.serialize() for post in posts], safe=False)
+    p = Paginator(posts, 2)
+    page_num = request.GET.get('page', 1)
+    try:
+        page = p.page(page_num)
+    except EmptyPage:
+        page = p.page(1)
+    json = {
+        "posts" : [post.serialize() for post in page],
+        "num_pages" : p.num_pages,
+    }
+    return JsonResponse(json, safe=False)
+
 
 def post(request, post_id):
     # Fetch post only with GET method
