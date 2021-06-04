@@ -4,8 +4,9 @@
 {% block body %}
 {% if user.is_authenticated %}
 <div id="new_post-view">
-    <h3>New Post</h3>
+    
     <form id="new_post-form">
+        <h5>New Post</h5>
         <textarea class="form-control" id="new_post-text" placeholder="Type here..."></textarea>
         <input type="submit" class="btn btn-primary" id="new_post-submit"/>
     </form>

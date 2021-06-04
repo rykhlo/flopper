@@ -1,28 +1,69 @@
+:root {
+  --border: #e1e5ea;
+}
 html, body {
+    background-color: #e1e5ea;
     width: 100%;
     height: 100%;
     margin: 0;
-    font-family: 'Open Sans', 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-        sans-serif;
+    font-family: "Goudy Bookletter 1911", sans-serif;
+    
+  }
+  h3 {
+    text-align: left;
+    padding-top: 1em;
+    padding-left: 1.5em;
+    display: block;
+  }
+  .heading_border {
+    padding-left: 1.5em;
+    color: red;
+    height: 2em;
+    width: 100%;
+  }
+ 
+  #new_post-view{
+    display: flex;
+    justify-content: center;
+    margin: 1em;
+  }
+  #new_post-form {
+    width: 30em;
+    background: #fff;
+    border-radius: 1em;
+    padding: 1em;
+    margin: 1em;  
+    justify-content: center;
+    text-align: center;
+  }
+  #new_post-text {
+    padding: 1em;
+  }
+  #new_post-submit {
+    margin: 1em;
+    padding: 0.5em;
+    padding-left: 3em;
+    padding-right: 3em;
+    background-color: #da7f8f;
   }
   
+
   .wrapper {
-    background-color: #eee;
-    display: grid;
-    grid-template-columns: 400px;
+    background-color: #e1e5ea;
+    display: flex;
     justify-content: center;
+    margin: 1em;
   }
   
   .card {
-    width: 400px;
-    display: grid;
-    flex-direction: column;
+    width: 30em;
     background: #fff;
-    border-radius: 0.5em;
+    border-radius: 1em;
     padding: 1em;
     margin: 1em;
+    
   }
+
   
   .card__header {
     display: flex;
@@ -54,9 +95,7 @@ html, body {
     color: #999;
     font-size: 0.85em;
   }
-  .card__meta__username:hover {
-    color: azure;
-  }
+  
   
   .card__meta__timestamp {
     color: #aaa;
@@ -107,7 +146,7 @@ html, body {
   transition-property: color, background-color;
 }
 .hvr-fade:hover, .hvr-fade:focus, .hvr-fade:active {
-  background-color: #dddddd;
+  background-color: rgb(245, 245, 245);
 }
 
 .pagination ul{
@@ -120,7 +159,7 @@ html, body {
   box-shadow: 0px 10px 15px rgba(0,0,0,0.1);
 }
 .pagination ul li{
-  color: #20B2AA;
+  color: #a7bbc7;
   list-style: none;
   line-height: 45px;
   text-align: center;
@@ -156,6 +195,136 @@ html, body {
 .pagination ul li.numb:hover,
 .pagination ul li:first-child:hover,
 .pagination ul li:last-child:hover{
-  color: #fff;
-  background: #20B2AA;
+  color: #faf3f3;
+  background: #da7f8f;
 }
+
+
+
+.profilecard {
+  width: 100%;
+  background-color: #a7bbc7;
+  padding: 3rem;
+  justify-content: center;
+  text-align: center;
+  color: #e1e5ea;
+}
+
+.profilecard__header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin-top: -15px;
+}
+
+.profilecard__profile img {
+  border-radius: 50%;
+  height: 5rem;
+  width: 5rem;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.profilecard__name {
+  margin-left: 1.25rem;
+  
+}
+
+.profilecard__handle {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin-top: 3px;
+}
+
+.profilecard__button svg {
+  height: 1.05rem;
+  width: 1.05rem;
+  margin-right: 5px;
+}
+
+.profilecard__button {
+  margin-left: auto;
+}
+.profilecard__button {
+  margin-left: auto;
+}
+
+.profilecard__button button {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  font-size: 1.05rem;
+  background-color: #da7f8f;
+  color: white;
+  font-weight: bold;
+  border: none;
+  height: 40px;
+  width: 100px;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  cursor: pointer;
+}
+
+.profilecard__button button:active {
+  -webkit-transform: scale(0.96);
+          transform: scale(0.96);
+}
+
+.profilecard__heading {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+span.circle {
+  height: 3px;
+  width: 3px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0 8px;
+}
+
+.border {
+  border-radius: 5px;
+  height: 2px;
+  background-color: var(--border);
+  border: none;
+  margin: 1.25rem 0;
+}
+
+.navlinks {
+  list-style: none;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin-bottom: 1.25rem;
+  opacity: 1;
+  font-weight: bold;
+}
+
+.navlinks li + li {
+  margin-left: 20px;
+}
+
+
+
+
+

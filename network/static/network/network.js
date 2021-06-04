@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Display New Post form only for authenticated users in all posts tab
         document.querySelector("#posts-view").style.display = "block";
         if (isAuthenticated && post_filter === "all") {
-            document.querySelector("#new_post-view").style.display = "block";
+            document.querySelector("#new_post-view").style.display = "flex";
         } else if (isAuthenticated) {
             document.querySelector("#new_post-view").style.display = "none";
         }
@@ -89,11 +89,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (post_filter === "all") {
             document.querySelector("#profile-view").style.display = "none";
             document.querySelector("#posts-view").innerHTML =
-                "<h3>All Posts</h3>";
+                '<h3>All Posts</h3> <hr class="heading_border"/>';
         } else if (post_filter === "following") {
             document.querySelector("#profile-view").style.display = "none";
             document.querySelector("#posts-view").innerHTML =
-                "<h3>Following</h3>";
+                '<h3>Following</h3><hr class="heading_border"/>';
         }
 
         // Fetch posts based on filter
@@ -165,12 +165,39 @@ document.addEventListener("DOMContentLoaded", function () {
             //history.pushState({section: section}, "", `${section}`);
             load_profile(post.author);
         });
-        post_card.addEventListener("click", () => load_post(post.id));
+        post_card_text.addEventListener("click", () => {
+            load_profile(post.author);
+            //$(`#Modal${post.id}`).modal("show")
+        });
         post_card_displayname.innerHTML = `${post.author}`;
         post_card_username.innerHTML = `@${post.author}`;
         post_card_timestamp.innerHTML = `${post.timestamp}`;
         post_card_text.innerHTML = `${post.text}`;
 
+        // Modal popup
+        const post_modal = document.createElement('div')
+        Object.assign(post_modal, {
+            className: 'modal fade',
+            id: `Modal${post.id}`,
+            tabindex: '-1',
+        })
+        post_modal.setAttribute("aria-labelledby", "exampleModalLabel");
+        post_modal.setAttribute("aria-hidden", "true");
+        post_modal.innerHTML = `
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        ${post.id}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div> 
+        `;
+        post_modal.getElementsByClassName("modal-body")[0].innerHTML = post_card.innerHTML
+        post_card.appendChild(post_modal)        
         document.querySelector("#posts-view").append(post_card);
     }
 
@@ -189,6 +216,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
     function load_profile(profile) {
+        
         // clear the profile-view
         document.querySelector("#profile-view").innerHTML = "";
         document.querySelector("#profile-view").style.display = "block";
@@ -198,34 +226,52 @@ document.addEventListener("DOMContentLoaded", function () {
             .then((data) => {
                 // Create a card that displays followers info
                 const followers_card = document.createElement("div");
-                followers_card.setAttribute("class", "card");
-                followers_card.setAttribute("style", "width: 18rem;");
+                followers_card.setAttribute("class", "profilecard");
                 followers_card.innerHTML = `
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><strong>${data.username}</strong></li>
-                    <li class="list-group-item">Followers: ${data.followers.length}</li>
-                    <li class="list-group-item">Following: ${data.following.length}</li>
-                </ul>
+      <div class="profilecard__header">
+        <div class="profilecard__profile">
+          <img
+            src="https://randomuser.me/api/portraits/men/52.jpg"
+            alt="A man smiling"
+          />
+        </div>
+        <div class="profilecard__name">
+          <h2>${data.username}</h2>
+          <div class="profilecard__handle">
+            <span class="circle"></span>
+            <span class="handle">@${data.username}</span>
+          </div>
+        </div>
+        <div class="profilecard__button">
+          <button class="btn btn-outline">
+          </button>
+        </div>
+      </div>
+      <hr class="border" />
+        <ul class="navlinks">
+          <li>Followers: ${data.followers.length}</li>
+          <li>Following: ${data.following.length}</li>
+        </ul>
+      </div>
+      
             `;
                 // Display follow button if profile is not user's
+                const follow_button = followers_card.getElementsByClassName("btn btn-outline")[0];
                 if (username != profile) {
-                    const follow_button = document.createElement("button");
-                    follow_button.className = "btn btn-outline-secondary";
                     follow_button.innerHTML = `${
                         data.followers.includes(username)
                             ? "Unfollow"
                             : "Follow"
                     }`;
                     follow_button.onclick = () => follow(profile);
-                    document
-                        .getElementById("profile-view")
-                        .appendChild(follow_button);
+                } else {
+                    follow_button.setAttribute("style", "display:none")
                 }
 
                 document.querySelector("#profile-view").append(followers_card);
                 // Add title for posts
                 const user_posts_title = document.createElement("h3");
-                user_posts_title.innerHTML = `<h3> ${profile}'s Posts</h3>`;
+                user_posts_title.innerHTML = `<h3> ${profile}'s Posts</h3> <hr class="heading_border"/>`;
                 document
                     .querySelector("#profile-view")
                     .append(user_posts_title);
@@ -297,21 +343,14 @@ document.addEventListener("DOMContentLoaded", function () {
             afterPage = afterPage + 1;
         }
 
-        for (var plength = beforePage; plength <= afterPage; plength++) {
+        for (var plength = beforePage; plength < afterPage; plength++) {
             if (plength > totalPages) {
                 //if plength is greater than totalPage length then continue
                 continue;
             }
-            if (plength == 0 || plength == 1) {
+            if (plength == 0 ) {
                 //if plength is 0 than add +1 in plength value
-                plength = plength + 1;
-            }
-            if (page == plength) {
-                //if page is equal to plength than assign active string in the active variable
-                active = "active";
-            } else {
-                //else leave empty to the active variable
-                active = "";
+                plength = plength + 1;tive = "";
             }
             liTag += `<li class="numb ${plength}"><span>${plength}</span></li>`;
         }
