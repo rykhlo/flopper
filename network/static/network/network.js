@@ -107,39 +107,14 @@ document.addEventListener("DOMContentLoaded", function () {
             .then((data) => {
                 posts = data["posts"];
                 posts.forEach((post) => {
-                    generate_post_card(post);
-                    // New comment submit form
-                    if (isAuthenticated) {
-                        document
-                            .querySelector(`.new_comment-submit${post.id}`)
-                            .addEventListener("click", () => {
-                                fetch(`/post/${post.id}`, {
-                                    method: "POST",
-                                    body: JSON.stringify({
-                                        text: document.querySelector(`.new_comment-text${post.id}`).value,
-                                    }),
-                                })
-                                    .then((response) => response.json())
-                                    .then((result) => {
-                                        document.querySelector(`.new_comment-text${post.id}`).value = ""
-                                        console.log(result);
-                                        if (result["error"]) {
-                                            console.log(result["error"]);
-                                        } else {
-                                            //load_posts("post_filter")
-                                        }
-                                    });
-                                return false;
-                        });
-    }
-
+                    generate_post_card(post,post_filter);
                 });
                 const pagination = generate_pagination(data, post_filter);
                 document.querySelector("#posts-view").append(pagination);
             });
     }
 
-    function generate_post_card(post) {
+    function generate_post_card(post, post_filter) {
         const post_card = document.createElement("div");
         post_card.setAttribute("class", "wrapper");
         post_card.setAttribute("id", "post-card");
@@ -220,15 +195,49 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="modal-body">
                         ${post.id}
                     </div>
-                    <form class="new_comment-form${post.id}">
-                        <h5>Add Comment</h5>
-                        <textarea class="new_comment-text${post.id}" placeholder="Type here..."></textarea>
-                        <button type="button" class="new_comment-submit${post.id}">Submit</button>
+                    <form id="new_comment-form${post.id}">
+                        <h5>New Comment</h5>
+                        <textarea class="form-control comment" id="new_comment-text" placeholder="Type here..."></textarea>
+                        <button type="button" class="btn btn-primary" id="$new_comment-submit">Submit</button>
                     </form>
                 </div>
             </div> 
         `;
         post_modal.getElementsByClassName("modal-body")[0].innerHTML = post_card.innerHTML
+        const post_modal_textarea = post_modal.getElementsByClassName(
+            "form-control comment"
+        )[0];
+        const post_modal_submit = post_modal.getElementsByClassName(
+            "btn btn-primary"
+        )[0];
+        post_modal_submit.addEventListener("click", () => {
+            $(`#Modal${post.id}`).modal("show")
+            return false;
+        });
+        if (isAuthenticated) {
+            post_modal_submit.addEventListener("click", () => {
+                fetch(`/post/${post.id}`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        text: post_modal_textarea.value,
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then((result) => {
+                        console.log(result);
+                        if (result["error"]) {
+                            console.log(result["error"]);
+                        } else {
+                            $(`#Modal${post.id}`).modal("hide")
+                            setTimeout(() => {
+                                load_posts(post_filter);
+                            }, 1000);
+                            $(`#Modal${post.id}`).modal("show")
+                        }
+                    });
+                return false;
+            });
+        }
         // load comments and add them to the modal
         fetch(`post/${post.id}`)
             .then((response) => response.json())
