@@ -134,20 +134,41 @@ def posts(request, post_filter):
         page = p.page(1)
     json = {
         "posts" : [post.serialize() for post in page],
+        #"comments": [post.comments.all() for post in page],
         "num_pages" : p.num_pages,
     }
     return JsonResponse(json, safe=False)
 
-
+@csrf_exempt
 def post(request, post_id):
-    # Fetch post only with GET method
-    if request.method != "GET":
-        return JsonResponse({"error": "GET request required."}, status=400)
-    try:
-        post = Post.objects.get(pk=post_id)
-    except Post.DoesNotExist:
-        return JsonResponse({"error": "Invalid Post ID."}, status=400) 
-    return JsonResponse(post.serialize())
+    # Fetch post comments only with GET method
+    if request.method == "GET":
+        try:
+            post = Post.objects.get(pk=post_id)
+        except Post.DoesNotExist:
+            return JsonResponse({"error": "Invalid Post ID."}, status=400) 
+        jsonData = {
+            "comments" : [comment.serialize() for comment in post.comments.all()],
+        }
+        return JsonResponse(jsonData, safe=False)
+    if request.method == "POST":
+        # Get contents of comment
+        data = json.loads(request.body)  
+        text = data.get("text")
+        # Check if new comment is not empty
+        if text == "":
+            return JsonResponse({
+                "error": "New comment cannot be empty"
+            }, status=400)
+
+        # Save the coment 
+        comment = Comment(
+            author=request.user,
+            text=text,
+            post=Post.objects.get(pk=post_id),
+        )
+        comment.save()
+        return JsonResponse({"message": "New comment created successfully."}, status=201)
 
 @csrf_exempt
 @login_required(login_url='/login')

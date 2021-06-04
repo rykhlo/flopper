@@ -40,7 +40,7 @@ class Comment(models.Model):
         return {
             "id" : self.id,
             "author" : self.author.username,
-            "post" : self.post,
+            "post_id" : self.post.id,
             "text" : self.text,
             "timestamp" : self.timestamp,
         }
