@@ -19,13 +19,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // By default, load the all posts. Add listeners depending on whether the user is logged in
     //history.pushState({section: "all"}, "", `all`);
-    load_posts("all");
+    load_posts("all", true);
     document
         .querySelector("#all_posts-link")
         .addEventListener("click", function () {
             const section = this.dataset.section;
             //history.pushState({section: section}, "", `${section}`);
-            load_posts("all");
+            load_posts("all", true);
             return false;
         });
 
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .addEventListener("click", function () {
                 const section = this.dataset.section;
                 //history.pushState({section: section}, "", `${section}`);
-                load_posts("following");
+                load_posts("following", true);
                 return false;
             });
 
@@ -70,14 +70,17 @@ document.addEventListener("DOMContentLoaded", function () {
                         if (result["error"]) {
                             console.log(result["error"]);
                         } else {
-                            load_posts("all");
+                            load_posts("all", true);
                         }
                     });
                 return false;
             });
     }
     
-    function load_posts(post_filter) {
+    function load_posts(post_filter, fromStart) {
+        if (fromStart === true){
+            current_page = 1
+        }
         // clear the posts-view
         document.querySelector("#posts-view").innerHTML = "";
 
@@ -162,12 +165,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const post_card_timestamp = post_card.getElementsByClassName(
             "card__meta__timestamp"
         )[0];
+        const post_card_comment = post_card.getElementsByClassName(
+            "card__footer__comment"
+        )[0];
+        post_card_comment.addEventListener("click", () => {
+            $(`#Modal${post.id}`).modal("show")
+            return false;
+        });
         const post_card_text =
             post_card.getElementsByClassName("card__body")[0];
-        post_card_displayname.setAttribute("data-section", `u/${post.author}`);
         post_card_displayname.addEventListener("click", function () {
-            const section = post_card_displayname.dataset.section;
-            //history.pushState({section: section}, "", `${section}`);
             load_profile(post.author);
             return false;
         });
@@ -179,6 +186,7 @@ document.addEventListener("DOMContentLoaded", function () {
         post_card_username.innerHTML = `@${post.author}`;
         post_card_timestamp.innerHTML = `${post.timestamp}`;
         post_card_text.innerHTML = `${post.text}`;
+        post_card_comment.innerHTML = `<i class="far fa-comment"></i> ${post.comments.length}`
 
         // Modal popup
         const post_modal = document.createElement('div')
@@ -228,11 +236,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         if (result["error"]) {
                             console.log(result["error"]);
                         } else {
-                            $(`#Modal${post.id}`).modal("hide")
-                            setTimeout(() => {
-                                load_posts(post_filter);
-                            }, 1000);
-                            $(`#Modal${post.id}`).modal("show")
+                            //TODO make the modal refresh with the new comment
+                            $(`#Modal${post.id}`).modal('hide');
+                            load_posts(post_filter, false);
+                            
                         }
                     });
                 return false;

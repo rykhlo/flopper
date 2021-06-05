@@ -29,6 +29,7 @@ class Post(models.Model):
             "text" : self.text,
             "timestamp" : self.timestamp.strftime("%c"),
             "likes" : [user.username for user in self.likes.all()],
+            "comments" : [comment.id for comment in self.comments.all()],
         }
 
 class Comment(models.Model):
