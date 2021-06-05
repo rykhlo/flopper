@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
     //     showSection(event.state.section);
     // };
     // function showSection(section) {
-    //     console.log(section.slice(0, 2));
     //     if (section === "all" || "following") {
     //         load_posts(`${section}`);
     //     } else {
@@ -229,15 +228,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="modal-body">
                         ${post.id}
                     </div>
-                    <form id="new_comment-form${post.id}">
+                    <form class="new_comment-form">
                         <h5>New Comment</h5>
-                        <textarea class="form-control comment" id="new_comment-text" placeholder="Type here..."></textarea>
-                        <button type="button" class="btn btn-primary" id="$new_comment-submit">Submit</button>
+                        <textarea class="form-control comment" placeholder="Type here..."></textarea>
+                        <button type="button" class="btn btn-primary" >Submit</button>
                     </form>
                 </div>
             </div> 
         `;
         post_modal.getElementsByClassName("modal-body")[0].innerHTML = post_card.innerHTML
+        post_modal.getElementsByClassName("card__footer")[0].innerHTML = "<small>Original Poster</small>"
         const post_modal_textarea = post_modal.getElementsByClassName(
             "form-control comment"
         )[0];
@@ -276,6 +276,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 comments.forEach((comment) => {
                     const comment_div = document.createElement("div");
                     comment_div.innerHTML = post_card.innerHTML
+                    comment_div.getElementsByClassName("card__footer")[0].innerHTML = `replying to ${post.author}`
                     const comment_div_displayname = comment_div.getElementsByClassName(
                         "card__meta__displayname"
                     )[0];
@@ -519,7 +520,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (btn_next){
             btn_next.addEventListener("click", function () {
                 current_page++
-                console.log(current_page)
                 load_posts(post_filter, false)
                 return false;
             });
@@ -530,7 +530,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (btn_prev){
             btn_prev.addEventListener("click", function () {
                 current_page--
-                console.log(current_page)
                 load_posts(post_filter, false)
                 return false;
             });
@@ -541,7 +540,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (first_numb){
             first_numb.addEventListener("click", function () {
                 current_page = 1
-                console.log(current_page)
                 load_posts(post_filter, false)
                 return false;
             });
@@ -552,7 +550,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (last_numb){
             last_numb.addEventListener("click", function () {
                 current_page = totalPages
-                console.log(current_page)
                 load_posts(post_filter, false)
                 return false;
             });
@@ -564,7 +561,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (plus_numb){
                 plus_numb.addEventListener("click", function () {
                     current_page = current_page + i
-                    console.log(current_page)
                     load_posts(post_filter, false)
                     return false;
                 });
@@ -577,7 +573,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (minus_numb){
                 minus_numb.addEventListener("click", function () {
                     current_page = i
-                    console.log(current_page)
                     load_posts(post_filter, false)
                     return false;
                 });

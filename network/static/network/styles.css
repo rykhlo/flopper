@@ -353,7 +353,7 @@ span.circle {
   margin-bottom: 0;
 }
 
-#new_comment-form {
+.new_comment-form {
   width: 30em;
   background: #fff;
   border-radius: 1em;
@@ -361,10 +361,10 @@ span.circle {
   justify-content: center;
   text-align: center;
 }
-#new_comment-text {
+.new_comment-form .form-control {
   padding: 1em;
 }
-#new_comment-submit {
+.new_comment-form .btn{
   margin: 1em;
   padding: 0.5em;
   padding-left: 3em;
