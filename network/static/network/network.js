@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                     <div class="card__footer">
                         <span class="card__footer__like">
-                        <i class="far fa-heart"></i> 13
+                        <i class="far fa-heart"></i> 134
                         </span>
                         <span class="card__footer__comment">
                         <i class="far fa-comment"></i> 2
@@ -168,6 +168,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const post_card_comment = post_card.getElementsByClassName(
             "card__footer__comment"
         )[0];
+        const post_card_like = post_card.getElementsByClassName(
+            "card__footer__like"
+        )[0];
+        post_card_like.addEventListener("click", () => {
+            like(post, post_filter)
+            return false;
+        });
         post_card_comment.addEventListener("click", () => {
             $(`#Modal${post.id}`).modal("show")
             return false;
@@ -186,17 +193,18 @@ document.addEventListener("DOMContentLoaded", function () {
         post_card_username.innerHTML = `@${post.author}`;
         post_card_timestamp.innerHTML = `${post.timestamp}`;
         post_card_text.innerHTML = `${post.text}`;
-        post_card_comment.innerHTML = `<i class="far fa-comment"></i> ${post.comments.length}`
+        post_card_comment.innerHTML = `<i class="far fa-comment"></i> ${post.comments.length}`;
+        post_card_like.innerHTML = `<i class="far fa-heart"></i> ${post.likes.length}`;
 
         // Modal popup
         const post_modal = document.createElement('div')
         Object.assign(post_modal, {
             className: 'modal fade',
             id: `Modal${post.id}`,
-            tabindex: '-1',
+            // tabindex: '-1',
         })
-        post_modal.setAttribute("aria-labelledby", "exampleModalLabel");
-        post_modal.setAttribute("aria-hidden", "true");
+        // post_modal.setAttribute("aria-labelledby", "exampleModalLabel");
+        // post_modal.setAttribute("aria-hidden", "true");
         post_modal.innerHTML = `
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -342,7 +350,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     .querySelector("#profile-view")
                     .append(user_posts_title);
                 // Load posts of the specified profile
-                load_posts(profile);
+                load_posts(profile, true);
             });
     }
 
@@ -357,6 +365,20 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         setTimeout(() => {
             load_profile(username);
+        }, 250);
+        return false;
+    }
+    //Like/ Inlike selected Post
+    function like(post, post_filter) {
+        fetch (`/post/${post.id}`, {
+            method: "PUT",
+        })
+            .then((response) => response.json())
+            .then((result) => {
+                console.log(result);
+            });
+        setTimeout(() => {
+            load_posts(post_filter, false);
         }, 250);
         return false;
     }
@@ -449,7 +471,7 @@ document.addEventListener("DOMContentLoaded", function () {
             btn_next.addEventListener("click", function () {
                 current_page++
                 console.log(current_page)
-                load_posts(post_filter)
+                load_posts(post_filter, false)
                 return false;
             });
         }
@@ -460,7 +482,7 @@ document.addEventListener("DOMContentLoaded", function () {
             btn_prev.addEventListener("click", function () {
                 current_page--
                 console.log(current_page)
-                load_posts(post_filter)
+                load_posts(post_filter, false)
                 return false;
             });
         }
@@ -471,7 +493,7 @@ document.addEventListener("DOMContentLoaded", function () {
             first_numb.addEventListener("click", function () {
                 current_page = 1
                 console.log(current_page)
-                load_posts(post_filter)
+                load_posts(post_filter, false)
                 return false;
             });
         }
@@ -482,7 +504,7 @@ document.addEventListener("DOMContentLoaded", function () {
             last_numb.addEventListener("click", function () {
                 current_page = totalPages
                 console.log(current_page)
-                load_posts(post_filter)
+                load_posts(post_filter, false)
                 return false;
             });
         }
@@ -494,7 +516,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 plus_numb.addEventListener("click", function () {
                     current_page = current_page + i
                     console.log(current_page)
-                    load_posts(post_filter)
+                    load_posts(post_filter, false)
                     return false;
                 });
             }
@@ -507,7 +529,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 minus_numb.addEventListener("click", function () {
                     current_page = i
                     console.log(current_page)
-                    load_posts(post_filter)
+                    load_posts(post_filter, false)
                     return false;
                 });
             }

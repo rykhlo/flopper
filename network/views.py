@@ -149,6 +149,7 @@ def post(request, post_id):
             return JsonResponse({"error": "Invalid Post ID."}, status=400) 
         jsonData = {
             "comments" : [comment.serialize() for comment in post.comments.all()],
+            "post" : post.serialize(),
         }
         return JsonResponse(jsonData, safe=False)
     if request.method == "POST":
@@ -169,6 +170,23 @@ def post(request, post_id):
         )
         comment.save()
         return JsonResponse({"message": "New comment created successfully."}, status=201)
+
+    # PUT method for post likes
+    if request.method == "PUT": 
+        try:
+            post = Post.objects.get(pk=post_id)
+        except Post.DoesNotExist:
+            return JsonResponse({"error": "Invalid Post ID."}, status=400)
+        message = ""
+        if (request.user in post.likes.all()):
+            post.likes.remove(request.user)
+            message = f"Post {post_id} liked by {request.user.username} "
+        else:
+            post.likes.add(request.user)
+            message = f"Post {post_id} unliked by {request.user.username} "
+        post.save()
+        return JsonResponse({"message": message}, status=201)
+
 
 @csrf_exempt
 @login_required(login_url='/login')
