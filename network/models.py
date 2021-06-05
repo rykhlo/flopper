@@ -43,7 +43,7 @@ class Comment(models.Model):
             "author" : self.author.username,
             "post_id" : self.post.id,
             "text" : self.text,
-            "timestamp" : self.timestamp,
+            "timestamp" : self.timestamp.strftime("%c"),
         }
 
 

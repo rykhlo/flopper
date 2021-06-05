@@ -182,10 +182,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const post_card_edit_submit = post_card.getElementsByClassName(
             "btn btn-sm btn-outline-secondary edit_submit"
         )[0];
-        post_card_edit.addEventListener("click", () => {
-            edit(post, post_card_text, post_card_edit_submit, post_filter)
-            return false;
-        });
+        // if authour is user, add event listener for post edit, else hide
+        if (username === post.author){
+            post_card_edit.addEventListener("click", () => {
+                edit(post, post_card_text, post_card_edit_submit, post_filter)
+                return false;
+            });
+        }
+        else {
+            post_card_edit.style.display = "none"
+        }
         post_card_like.addEventListener("click", () => {
             like(post, post_filter)
             return false;
@@ -288,15 +294,20 @@ document.addEventListener("DOMContentLoaded", function () {
                     )[0];
                     const comment_div_text =
                         comment_div.getElementsByClassName("card__body")[0];
-                    comment_div_displayname.addEventListener("click", function () {
-                        load_profile(post.author);
-                        return false;
-                    });
                     comment_div_displayname.innerHTML = `${comment.author}`;
                     comment_div_username.innerHTML = `@${comment.author}`;
                     comment_div_timestamp.innerHTML = `${comment.timestamp}`;
                     comment_div_text.innerHTML = `${comment.text}`;
-                    post_modal.getElementsByClassName("modal-body")[0].innerHTML += comment_div.innerHTML
+
+                    comment_div_displayname.addEventListener("click", function () {
+                        console.log("somethinf")
+                        $(`#Modal${post.id}`).modal('hide');
+                        load_profile(comment.author);
+                        return false;
+                    });
+
+                    //post_modal.getElementsByClassName("modal-body")[0].innerHTML += comment_div.innerHTML
+                    post_modal.getElementsByClassName("modal-body")[0].appendChild(comment_div)
                 })
         });
         post_card.appendChild(post_modal)        

@@ -45,6 +45,9 @@ html, body {
     padding-right: 3em;
     background-color: #da7f8f;
   }
+  #new_post-submit:hover {
+    background-color: #a7bbc7;
+  }
   
 
   .wrapper {
@@ -87,7 +90,7 @@ html, body {
     font-weight: 700;
   }
   .card__meta__displayname:hover {
-    color:azure;
+    color:#da7f8f;
   }
   
   .card__meta__username {
@@ -124,11 +127,20 @@ html, body {
   .card__footer__comment {
     margin-left: 1em;
   }
+  .card__footer__comment:hover {
+    color: #da7f8f;
+  }
+  .card__footer__like:hover {
+    color: #da7f8f;
+  }
   
   .card__footer__edit {
     margin-left: auto;
     margin-right: 0.5em;
     color: #999;
+  }
+  .card__footer__edit:hover {
+    color: #da7f8f;
   }
   .edit_submit {
     margin-left: 16em;
@@ -371,6 +383,9 @@ span.circle {
   padding-right: 3em;
   background-color: #da7f8f;
 }
-
-
-
+.new_comment-form .btn:hover{
+  background-color: #a7bbc7;
+}
+button:hover {
+  background-color: #faf3f3;
+}
