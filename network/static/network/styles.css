@@ -125,8 +125,13 @@ html, body {
     margin-left: 1em;
   }
   
-  .card__footer__share {
+  .card__footer__edit {
     margin-left: auto;
+    margin-right: 0.5em;
+    color: #999;
+  }
+  .edit_submit {
+    margin-left: 16em;
     margin-right: 0.5em;
     color: #999;
   }

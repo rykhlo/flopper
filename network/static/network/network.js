@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
+
+
     //store user's username
     var username = "";
     var current_page = 1;
@@ -149,8 +151,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         <span class="card__footer__comment">
                         <i class="far fa-comment"></i> 2
                         </span>
-                        <span class="card__footer__share">
+                        <button style="display:none" type="button" class="btn btn-sm btn-outline-secondary edit_submit">Submit Edit</button>
+                        <span class="card__footer__edit">
                         <i class="fas fa-edit"></i>
+                        </span>
                     </div>
                 </li>
             </ul>
@@ -165,12 +169,24 @@ document.addEventListener("DOMContentLoaded", function () {
         const post_card_timestamp = post_card.getElementsByClassName(
             "card__meta__timestamp"
         )[0];
+        const post_card_text =
+            post_card.getElementsByClassName("card__body")[0];
         const post_card_comment = post_card.getElementsByClassName(
             "card__footer__comment"
         )[0];
         const post_card_like = post_card.getElementsByClassName(
             "card__footer__like"
         )[0];
+        const post_card_edit = post_card.getElementsByClassName(
+            "card__footer__edit"
+        )[0];
+        const post_card_edit_submit = post_card.getElementsByClassName(
+            "btn btn-sm btn-outline-secondary edit_submit"
+        )[0];
+        post_card_edit.addEventListener("click", () => {
+            edit(post, post_card_text, post_card_edit_submit, post_filter)
+            return false;
+        });
         post_card_like.addEventListener("click", () => {
             like(post, post_filter)
             return false;
@@ -179,22 +195,24 @@ document.addEventListener("DOMContentLoaded", function () {
             $(`#Modal${post.id}`).modal("show")
             return false;
         });
-        const post_card_text =
-            post_card.getElementsByClassName("card__body")[0];
+        
         post_card_displayname.addEventListener("click", function () {
             load_profile(post.author);
             return false;
         });
-        post_card_text.addEventListener("click", () => {
-            $(`#Modal${post.id}`).modal("show")
-            return false;
-        });
+        // post_card_text.addEventListener("click", () => {
+        //     $(`#Modal${post.id}`).modal("show");
+        //     false;
+        // });
         post_card_displayname.innerHTML = `${post.author}`;
         post_card_username.innerHTML = `@${post.author}`;
         post_card_timestamp.innerHTML = `${post.timestamp}`;
         post_card_text.innerHTML = `${post.text}`;
         post_card_comment.innerHTML = `<i class="far fa-comment"></i> ${post.comments.length}`;
         post_card_like.innerHTML = `<i class="far fa-heart"></i> ${post.likes.length}`;
+        if (post.likes.includes(username)){
+            post_card_like.innerHTML = `<i class="fas fa-heart"></i> ${post.likes.length}`;
+        }
 
         // Modal popup
         const post_modal = document.createElement('div')
@@ -226,10 +244,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const post_modal_submit = post_modal.getElementsByClassName(
             "btn btn-primary"
         )[0];
-        post_modal_submit.addEventListener("click", () => {
-            $(`#Modal${post.id}`).modal("show")
-            return false;
-        });
+        // submit new comment to a post
         if (isAuthenticated) {
             post_modal_submit.addEventListener("click", () => {
                 fetch(`/post/${post.id}`, {
@@ -372,6 +387,9 @@ document.addEventListener("DOMContentLoaded", function () {
     function like(post, post_filter) {
         fetch (`/post/${post.id}`, {
             method: "PUT",
+            body: JSON.stringify({
+                liked: true,
+            })
         })
             .then((response) => response.json())
             .then((result) => {
@@ -381,6 +399,37 @@ document.addEventListener("DOMContentLoaded", function () {
             load_posts(post_filter, false);
         }, 250);
         return false;
+    }
+    //Like/ Inlike selected Post
+    function edit(post, post_card_text, post_card_edit_submit, post_filter) {
+        if (post_card_edit_submit.style.display === "block"){
+            post_card_text.innerHTML = `${post.text}`;
+            post_card_edit_submit.style.display = "none"
+            return false
+        }
+        post_card_text.innerHTML = `<textarea class="form-control edit" id="new_edit-text" placeholder="Type here..."></textarea>`;
+        post_card_text.getElementsByClassName("form-control edit")[0].value = `${post.text}`
+        post_card_edit_submit.style.display = ("block")
+        if (isAuthenticated) {
+            post_card_edit_submit.addEventListener("click", () => {
+                fetch (`/post/${post.id}`, {
+                    method: "PUT",
+                    body: JSON.stringify({
+                        edit: post_card_text.getElementsByClassName("form-control edit")[0].value,
+                    })
+                })
+                    .then((response) => response.json())
+                    .then((result) => {
+                        console.log(result);
+                    });
+                post_card_text.innerHTML = `${post.text}`;
+                post_card_edit_submit.style.display = ("none")
+                setTimeout(() => {
+                    load_posts(post_filter, false);
+                }, 250);
+                return false;
+                })
+            }
     }
 
     // document.addEventListener("DOMContentLoaded", function () {

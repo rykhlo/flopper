@@ -177,14 +177,21 @@ def post(request, post_id):
             post = Post.objects.get(pk=post_id)
         except Post.DoesNotExist:
             return JsonResponse({"error": "Invalid Post ID."}, status=400)
+        data = json.loads(request.body)
         message = ""
-        if (request.user in post.likes.all()):
-            post.likes.remove(request.user)
-            message = f"Post {post_id} liked by {request.user.username} "
-        else:
-            post.likes.add(request.user)
-            message = f"Post {post_id} unliked by {request.user.username} "
-        post.save()
+        if data.get("liked") is not None:
+            if (request.user in post.likes.all()):
+                post.likes.remove(request.user)
+                message = f"Post {post_id} unliked by {request.user.username} "
+            else:
+                post.likes.add(request.user)
+                message = f"Post {post_id} liked by {request.user.username} "
+            post.save()
+        if data.get("edit") is not None:
+            post.text = data["edit"]
+            post.save()
+            message = f"Post {post_id} has been edited successfully"
+        
         return JsonResponse({"message": message}, status=201)
 
 
