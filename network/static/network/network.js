@@ -110,9 +110,14 @@ document.addEventListener("DOMContentLoaded", function () {
             .then((response) => response.json())
             .then((data) => {
                 posts = data["posts"];
-                posts.forEach((post) => {
-                    generate_post_card(post,post_filter);
-                });
+                if (typeof posts != 'undefined'){
+                    if (posts.length === 0) {
+                        document.querySelector("#posts-view").append(`There are no posts yet`)
+                    }
+                    posts.forEach((post) => {
+                        generate_post_card(post,post_filter);
+                    });
+                }
                 const pagination = generate_pagination(data, post_filter);
                 document.querySelector("#posts-view").append(pagination);
             });
@@ -127,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <ul class="cards__list">
                 <li class="card hvr-fade">
                     <div class="card__header">
-                        <img class="card__profile-img" src="https://www.syfy.com/sites/syfy/files/styles/1200x680/public/syfywire_cover_media/2018/09/c-3po-see-threepio_68fe125c.jpg" alt="c3po"/>
+                        <img class="card__profile-img" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="c3po"/>
                     <div class="card__meta">
                         <div class="card__meta__displayname ">
                         C-3PO
@@ -236,7 +241,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                     <form class="new_comment-form">
                         <h5>New Comment</h5>
-                        <textarea class="form-control comment" placeholder="Type here..."></textarea>
+                        <textarea maxlength="280" class="form-control comment" placeholder="Type here..."></textarea>
                         <button type="button" class="btn btn-primary" >Submit</button>
                     </form>
                 </div>
@@ -279,6 +284,13 @@ document.addEventListener("DOMContentLoaded", function () {
             .then((response) => response.json())
             .then((data) => {
                 comments = data["comments"];
+                // Update profile pictures
+                post_card.getElementsByClassName(
+                    "card__profile-img"
+                )[0].setAttribute("src", data["image"]);
+                post_modal.getElementsByClassName(
+                    "card__profile-img"
+                )[0].setAttribute("src", data["image"]); 
                 comments.forEach((comment) => {
                     const comment_div = document.createElement("div");
                     comment_div.innerHTML = post_card.innerHTML
@@ -298,6 +310,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     comment_div_username.innerHTML = `@${comment.author}`;
                     comment_div_timestamp.innerHTML = `${comment.timestamp}`;
                     comment_div_text.innerHTML = `${comment.text}`;
+                    comment_div.getElementsByClassName(
+                        "card__profile-img"
+                    )[0].setAttribute("src", `${comment.image}`); 
 
                     comment_div_displayname.addEventListener("click", function () {
                         console.log("somethinf")
@@ -305,12 +320,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         load_profile(comment.author);
                         return false;
                     });
-
-                    //post_modal.getElementsByClassName("modal-body")[0].innerHTML += comment_div.innerHTML
                     post_modal.getElementsByClassName("modal-body")[0].appendChild(comment_div)
                 })
         });
-        post_card.appendChild(post_modal)        
+        post_card.appendChild(post_modal) 
+        // update the post image
         document.querySelector("#posts-view").append(post_card);
     }
 
@@ -332,7 +346,7 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class="profilecard__header">
         <div class="profilecard__profile">
           <img
-            src="https://randomuser.me/api/portraits/men/52.jpg"
+            src="${data.image}"
             alt="A man smiling"
           />
         </div>
@@ -350,8 +364,10 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>
       <hr class="border" />
         <ul class="navlinks">
-          <li>Followers: ${data.followers.length}</li>
-          <li>Following: ${data.following.length}</li>
+          <li>Followers: 
+                ${typeof data.followers === 'undefined' ? 0 : (data.followers.length)}</li>
+          <li>Following: 
+                ${typeof data.following === 'undefined' ? 0 : (data.following.length)}</li>
         </ul>
       </div>
       
@@ -419,7 +435,7 @@ document.addEventListener("DOMContentLoaded", function () {
             post_card_edit_submit.style.display = "none"
             return false
         }
-        post_card_text.innerHTML = `<textarea class="form-control edit" id="new_edit-text" placeholder="Type here..."></textarea>`;
+        post_card_text.innerHTML = `<textarea maxlength="280" class="form-control edit" id="new_edit-text" placeholder="Type here..."></textarea>`;
         post_card_text.getElementsByClassName("form-control edit")[0].value = `${post.text}`
         post_card_edit_submit.style.display = ("block")
         if (isAuthenticated) {
@@ -454,6 +470,88 @@ document.addEventListener("DOMContentLoaded", function () {
     //     });
     // });
     function generate_pagination(data, post_filter) {
+        const pagination = document.createElement("div");
+        pagination.setAttribute("class", "pagination");
+        // selecting required element
+        const pagination_ul = document.createElement("ul");
+        let liTag = "";
+
+        var current = current_page,
+            last = data["num_pages"],
+            delta = 2,
+            left = current - delta,
+            right = current + delta + 1,
+            range = [],
+            rangeWithDots = [],
+            l;
+    
+        for (let i = 1; i <= last; i++) {
+            if (i == 1 || i == last || i >= left && i < right) {
+                range.push(i);
+                if (i === last){
+                    liTag += `<li class="numb ${last}"><span>${last}</span></li>`;
+                }
+                else {
+                    liTag += `<li class="numb ${i}"><span>${i}</span></li>`;
+                }
+            }
+        }
+        pagination_ul.innerHTML = liTag; //add li tag inside ul tag
+        pagination.appendChild(pagination_ul);
+
+        const active_num = pagination.getElementsByClassName(
+            `numb ${current_page}`
+        )[0];
+        active_num.setAttribute("class", "numb active");
+
+        const first_numb = pagination.getElementsByClassName(
+            "numb 1"
+        )[0];
+        if (first_numb){
+            first_numb.addEventListener("click", function () {
+                current_page = 1
+                load_posts(post_filter, false)
+                return false;
+            });
+        }
+        const last_numb = pagination.getElementsByClassName(
+            `numb ${last}`
+        )[0];
+        if (last_numb){
+            last_numb.addEventListener("click", function () {
+                current_page = last
+                load_posts(post_filter, false)
+                return false;
+            });
+        }
+        for (let i = 1; i < 4; i++){
+            const plus_numb = pagination.getElementsByClassName(
+                `numb ${current_page + i}`
+            )[0];
+            if (plus_numb){
+                plus_numb.addEventListener("click", function () {
+                    current_page = current_page + i
+                    load_posts(post_filter, false)
+                    return false;
+                });
+            }
+        }
+        for (let i = current_page; i > current_page - 4; i--){
+            const minus_numb = pagination.getElementsByClassName(
+                `numb ${i}`
+            )[0];
+            if (minus_numb){
+                minus_numb.addEventListener("click", function () {
+                    current_page = i
+                    load_posts(post_filter, false)
+                    return false;
+                });
+            }
+        }  
+        return pagination
+        return rangeWithDots;
+    }
+    function xgenerate_pagination(data, post_filter) {
         // Pagination taken from https://codepen.io/fadzrinmadu/pen/KKWvYqW
         const pagination = document.createElement("div");
         pagination.setAttribute("class", "pagination");

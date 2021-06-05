@@ -1,30 +1,109 @@
 {% extends "network/layout.html" %}
-
+{% block style%}
+<style>
+    ::selection {
+        background-color: #da7f8f;
+    }
+    ::-moz-selection {
+        background-color: #da7f8f;
+    }
+    body {
+        background: #e1e5ea;
+    }
+    .container {
+        display: -webkit-flex;
+        display: flex;
+        height: 100%;
+    }
+    #logbox {
+        margin: 50px auto;
+        width: 340px;
+        background-color: #fff;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        -ms-border-radius: 4px;
+        border-radius: 4px;
+        -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+        -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    }
+    h1 {
+        text-align: center;
+        font-size: 175%;
+        color: #757575;
+        font-weight: 300;
+        margin: 1em;
+    }
+    h1, input {
+        font-family: "Open Sans", Helvetica, sans-serif;
+    }
+    .input {
+        width: 75%;
+        height: 50px;
+        display: block;
+        margin: 0 auto 15px;
+        padding: 0 15px;
+        border: none;
+        border-bottom: 2px solid #ebebeb;
+    }
+    .input:focus {
+        outline: none;
+        border-bottom-color: #a7bbc7 !important;
+    }
+    .input:hover {
+        border-bottom-color: #da7f8f;
+    }
+    .input:invalid {
+        box-shadow: none;
+    }
+    .pass:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0 1000px white inset;
+    }
+    .inputButton {
+        position: relative;
+        width: 85%;
+        height: 50px;
+        display: block;
+        margin: 30px auto 30px;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        -ms-border-radius: 5px;
+        border-radius: 5px;
+        color: white;
+        background-color: #da7f8f;
+        border: none;
+    }
+    .inputButton:hover {
+        top: 2px;
+        background-color: #a7bbc7;
+    }
+    .inputButton:active {
+        top: 5px;
+        box-shadow: none;
+    }
+    .inputButton:focus {
+        outline: none;
+    }
+</style>
+{% endblock %}
 {% block body %}
 
-    <h2>Register</h2>
-
-    {% if message %}
+   {% if message %}
         <div>{{ message }}</div>
     {% endif %}
+    <!--https://codepen.io/subnomo/pen/duioa -->
+    <div class="container">
+        <div id="logbox">
+            <form action="{% url 'register' %}" method="post">
+             {% csrf_token %}
+                <h1>Create an account</h1>
+                <input class="input pass" name="username" type="text" placeholder="Username" pattern="^[\w]{3,16}$" autofocus="autofocus" required="required" />
+                <input class="input pass" name="password" type="password" placeholder="Password" required="required" />
+                <input class="input pass" name="image_link" type="text" placeholder="Profile Image Link (optional)" />
+                <input class="inputButton" type="submit" value="Register" />
+            </form>
+        </div>
+    </div>
 
-    <form action="{% url 'register' %}" method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <input class="form-control" autofocus type="text" name="username" placeholder="Username">
-        </div>
-        <div class="form-group">
-            <input class="form-control" type="email" name="email" placeholder="Email Address">
-        </div>
-        <div class="form-group">
-            <input class="form-control" type="password" name="password" placeholder="Password">
-        </div>
-        <div class="form-group">
-            <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
-        </div>
-        <input class="btn btn-primary" type="submit" value="Register">
-    </form>
-
-    Already have an account? <a href="{% url 'login' %}">Log In here.</a>
 
 {% endblock %}

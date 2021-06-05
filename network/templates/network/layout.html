@@ -6,17 +6,21 @@
         <title>{% block title %}Social Network{% endblock %}</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link href="{% static 'network/styles.css' %}" rel="stylesheet">
+        {% block style %}
+        {% endblock %}
     </head>
     <body>
 
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">Network</a>
+        <nav class="navbar navbar-expand navbar-light ">
+            <a class="navbar-brand" >
+                    {% load static %} <img src="{% static "network/kisscc0-flappy-bird-sprite-computer-icons-opengameart-org-flying-bird-1-frame-4-5b7367df1c25f0.3510589115342898871153.svg" %}" alt="Rettiwt" width="60" height="48" class="d-inline-block align-top-left">
+                  </a>
           
             <div>
               <ul class="navbar-nav mr-auto">
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" id="profile-link" ><strong>{{ user.username }}</strong></a>
+                        <a class="nav-link" id="profile-link" ><strong>{{user.username}}</strong></a>
                     </li>
                 {% endif %}
                 <li class="nav-item">

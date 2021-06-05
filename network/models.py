@@ -9,17 +9,19 @@ class Profile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     following = models.ManyToManyField(User, related_name="following")
     followers = models.ManyToManyField(User, related_name="followers")
+    image_link = models.CharField(max_length=254, blank=True)
     def serialize(self):
         return {
             "id" : self.id,
             "username" : self.user.username,
             "following" : [user.username for user in self.following.all()],
             "followers" : [user.username for user in self.followers.all()],
+            "image" : Profile.objects.get(user=self.user).image_link,
         }
 
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
-    text = models.CharField(max_length=254)
+    text = models.CharField(max_length=280)
     timestamp = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(User, related_name="liked_posts")
     def serialize(self):
@@ -30,6 +32,7 @@ class Post(models.Model):
             "timestamp" : self.timestamp.strftime("%c"),
             "likes" : [user.username for user in self.likes.all()],
             "comments" : [comment.id for comment in self.comments.all()],
+            "image" : Profile.objects.get(user=self.author).image_link,
         }
 
 class Comment(models.Model):
@@ -44,6 +47,7 @@ class Comment(models.Model):
             "post_id" : self.post.id,
             "text" : self.text,
             "timestamp" : self.timestamp.strftime("%c"),
+            "image" : Profile.objects.get(user=self.author).image_link,
         }
 
 

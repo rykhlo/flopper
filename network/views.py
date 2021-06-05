@@ -44,7 +44,10 @@ def logout_view(request):
 def register(request):
     if request.method == "POST":
         username = request.POST["username"]
-        email = request.POST["email"]
+        if request.POST.get('email'):
+            email = request.POST.get('email')
+        else:
+            email = ''
 
         # Do not allow usernames that would interfer with the API
         prohibited_usernames = ["all", "following",]
@@ -55,17 +58,21 @@ def register(request):
 
         # Ensure password matches confirmation
         password = request.POST["password"]
-        confirmation = request.POST["confirmation"]
-        if password != confirmation:
-            return render(request, "network/register.html", {
-                "message": "Passwords must match."
-            })
+        # confirmation = request.POST["confirmation"]
+        # if password != confirmation:
+        #     return render(request, "network/register.html", {
+        #         "message": "Passwords must match."
+        #     })
 
         # Attempt to create new user
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
             profile = Profile.objects.create(user=user)
+            if request.POST.get('image_link'):
+                profile.image_link = request.POST.get('image_link')
+            else:
+                profile.image_link = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
             profile.save()
         except IntegrityError:
             return render(request, "network/register.html", {
@@ -126,7 +133,7 @@ def posts(request, post_filter):
 
     #return posts in reverse chronological order
     posts = posts.order_by("-timestamp").all()
-    p = Paginator(posts, 2)
+    p = Paginator(posts, 10)
     page_num = request.GET.get('page', 1)
     try:
         page = p.page(page_num)
@@ -150,6 +157,7 @@ def post(request, post_id):
         jsonData = {
             "comments" : [comment.serialize() for comment in post.comments.all()],
             "post" : post.serialize(),
+            "image" : Profile.objects.get(user=post.author).image_link
         }
         return JsonResponse(jsonData, safe=False)
     if request.method == "POST":
