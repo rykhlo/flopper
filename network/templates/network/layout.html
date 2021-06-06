@@ -24,7 +24,7 @@
                     </li>
                 {% endif %}
                 <li class="nav-item">
-                  <a class="nav-link" id="all_posts-link" data-section="all">All Posts</a>
+                  <a class="nav-link" id="all_posts-link" href="{% url 'index' %}" data-section="all">All Posts</a>
                 </li>
                 {% if user.is_authenticated %}
                     <li class="nav-item">
