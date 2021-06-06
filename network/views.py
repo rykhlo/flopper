@@ -7,6 +7,9 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage
 
+#TODO remove csrf_exempt and implement csrf tokens
+from django.views.decorators.csrf import csrf_exempt 
+
 from .models import User, Profile, Post, Comment
 
 
@@ -80,6 +83,7 @@ def register(request):
     else:
         return render(request, "network/register.html")
 
+@csrf_exempt
 @login_required(login_url='/login')
 def new_post(request):
     # new post must be via POST
@@ -103,6 +107,7 @@ def new_post(request):
     post.save()
     return JsonResponse({"message": "New post created successfully."}, status=201)
 
+@csrf_exempt
 def posts(request, post_filter):
     # Load all posts
     if post_filter == "all":
@@ -141,7 +146,7 @@ def posts(request, post_filter):
     }
     return JsonResponse(json, safe=False)
 
-
+@csrf_exempt
 def post(request, post_id):
     # Fetch post comments only with GET method
     if request.method == "GET":
@@ -198,6 +203,7 @@ def post(request, post_id):
         return JsonResponse({"message": message}, status=201)
 
 
+@csrf_exempt
 @login_required(login_url='/login')
 def profile(request, username):
     #try to load user from the database
@@ -211,6 +217,7 @@ def profile(request, username):
     return JsonResponse(profile.serialize())
 
     
+@csrf_exempt
 @login_required(login_url='/login')
 def follow(request,username):
     #Only accepts PUT requests

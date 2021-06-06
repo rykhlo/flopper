@@ -4,26 +4,19 @@ document.addEventListener("DOMContentLoaded", function () {
     //store user's username
     var username = "";
     var current_page = 1;
-    var temp_liked = false; // for checking if the user have liked the post already on the current page load
     // True if user is logged in
     var isAuthenticated = document.querySelector("#profile-link") !== null;
 
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    const csrftoken = getCookie('csrftoken');
+    // window.onpopstate = function (event) {
+    //     showSection(event.state.section);
+    // };
+    // function showSection(section) {
+    //     if (section === "all" || "following") {
+    //         load_posts(`${section}`);
+    //     } else {
+    //         load_profile(`${section}`);
+    //     }
+    // }
 
     // By default, load the all posts. Add listeners depending on whether the user is logged in
     //history.pushState({section: "all"}, "", `all`);
@@ -67,13 +60,11 @@ document.addEventListener("DOMContentLoaded", function () {
         document
             .querySelector("#new_post-submit")
             .addEventListener("click", () => {
-                const csrftoken = getCookie('csrftoken');
                 fetch("/posts", {
                     method: "POST",
                     body: JSON.stringify({
                         text: document.querySelector("#new_post-text").value,
                     }),
-                    headers: { "X-CSRFToken": csrftoken },
                 })
                     .then((response) => response.json())
                     .then((result) => {
@@ -121,7 +112,6 @@ document.addEventListener("DOMContentLoaded", function () {
             .then((response) => response.json())
             .then((data) => {
                 posts = data["posts"];
-                
                 if (typeof posts != 'undefined'){
                     if (posts.length === 0) {
                         document.querySelector("#posts-view").append(`There are no posts yet`)
@@ -161,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         I have a bad feeling about this!
                     </div>
                     <div class="card__footer">
-                        <span class="card__footer__like" id="card__footer__like#${post.id}">
+                        <span class="card__footer__like">
                         <i class="far fa-heart"></i> 134
                         </span>
                         <span class="card__footer__comment">
@@ -210,6 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
             post_card_edit.style.display = "none"
         }
         post_card_like.addEventListener("click", () => {
+<<<<<<< HEAD
             if (isAuthenticated){
                 if (post.likes.includes(username)){
                     like(post, post_filter, true)
@@ -221,6 +212,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 location.href = "/login"
             }
             
+=======
+            like(post, post_filter)
+>>>>>>> parent of a4a95b6 (added csrf tokens)
             return false;
         });
         post_card_comment.addEventListener("click", () => {
@@ -294,13 +288,11 @@ document.addEventListener("DOMContentLoaded", function () {
         // submit new comment to a post
         if (isAuthenticated) {
             post_modal_submit.addEventListener("click", () => {
-                const csrftoken = getCookie('csrftoken');
                 fetch(`/post/${post.id}`, {
                     method: "POST",
                     body: JSON.stringify({
                         text: post_modal_textarea.value,
                     }),
-                    headers: { "X-CSRFToken": csrftoken },
                 })
                     .then((response) => response.json())
                     .then((result) => {
@@ -442,58 +434,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Follow/Unfollow selected user
     function follow(username) {
-        const csrftoken = getCookie('csrftoken');
         fetch(`/follow/${username}`, {
             method: "PUT",
-            headers: { "X-CSRFToken": csrftoken },
         })
             .then((response) => response.json())
             .then((result) => {
                 //console.log(result);
             });
-            
         setTimeout(() => {
             load_profile(username);
         }, 250);
         return false;
     }
     //Like/ Inlike selected Post
-    function like(post, post_filter, isLiked) {
-        const csrftoken = getCookie('csrftoken');
+    function like(post, post_filter) {
         fetch (`/post/${post.id}`, {
             method: "PUT",
             body: JSON.stringify({
                 liked: true,
-            }),
-            headers: { "X-CSRFToken": csrftoken },
+            })
         })
             .then((response) => response.json())
             .then((result) => {
                 //console.log(result);
             });
-            if (isLiked === false){
-                if (temp_liked === false){
-                    document.getElementById(`card__footer__like#${post.id}`).innerHTML = `<i class="fas fa-heart"></i> ${post.likes.length+1}`;
-                    temp_liked = true;
-                }
-                else {
-                    document.getElementById(`card__footer__like#${post.id}`).innerHTML = `<i class="far fa-heart"></i> ${post.likes.length}`;
-                    temp_liked = false;
-                }
-            }
-            else {
-                if (temp_liked === false){
-                    document.getElementById(`card__footer__like#${post.id}`).innerHTML = `<i class="far fa-heart"></i> ${post.likes.length-1}`;
-                    temp_liked = true;
-                }
-                else {
-                    document.getElementById(`card__footer__like#${post.id}`).innerHTML = `<i class="fas fa-heart"></i> ${post.likes.length}`;
-                    temp_liked = false;
-                }             
-            }
-
-            
-
+        setTimeout(() => {
+            load_posts(post_filter, false);
+        }, 250);
         return false;
     }
     //Like/ Inlike selected Post
@@ -508,13 +475,11 @@ document.addEventListener("DOMContentLoaded", function () {
         post_card_edit_submit.style.display = ("block")
         if (isAuthenticated) {
             post_card_edit_submit.addEventListener("click", () => {
-                const csrftoken = getCookie('csrftoken');
                 fetch (`/post/${post.id}`, {
                     method: "PUT",
                     body: JSON.stringify({
                         edit: post_card_text.getElementsByClassName("form-control edit")[0].value,
-                    }),
-                    headers: { "X-CSRFToken": csrftoken },
+                    })
                 })
                     .then((response) => response.json())
                     .then((result) => {
