@@ -3,7 +3,8 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>{% block title %}Social Network{% endblock %}</title>
+        <title>{% block title %}Flopper{% endblock %}</title>
+        <link rel="shortcut icon" href="{% static "network/floppa.webp" %}"/>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link href="{% static 'network/styles.css' %}" rel="stylesheet">
         {% block style %}
@@ -12,15 +13,15 @@
     <body>
 
         <nav class="navbar navbar-expand navbar-light ">
-            <a class="navbar-brand" >
-                    {% load static %} <img src="{% static "network/kisscc0-flappy-bird-sprite-computer-icons-opengameart-org-flying-bird-1-frame-4-5b7367df1c25f0.3510589115342898871153.svg" %}" alt="Rettiwt" width="60" height="48" class="d-inline-block align-top-left">
+            <a class="navbar-brand" href="{% url 'index' %}">
+                    {% load static %} <img src="{% static "network/floppa.webp" %}" alt="Rettiwt" width="60" height="48" class="d-inline-block align-top-left">
                   </a>
           
             <div>
               <ul class="navbar-nav mr-auto">
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" id="profile-link" ><strong>{{user.username}}</strong></a>
+                        <a class="nav-link" id="profile-link" >{{user.username}}</a>
                     </li>
                 {% endif %}
                 <li class="nav-item">
@@ -49,9 +50,7 @@
             {% block body %}
             {% endblock %}
         </div>
-        <script src="https://kit.fontawesome.com/f9b7120ce2.js" crossorigin="anonymous"></script>
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
-        <script src="{% static 'network/network.js' %}"></script>
+        {% block script%}
+        {% endblock %}
     </body>
 </html>

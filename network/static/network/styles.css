@@ -2,14 +2,16 @@
 :root {
   --border: #e1e5ea;
 }
-html, body {
+  html, body {
     background-color: #e1e5ea;
     width: 100%;
     height: 100%;
     margin: 0;
-    font-family: 'Poppins', sans-serif;
-    
+    padding: 0;
+    overflow-x: hidden;
+    font-family: 'Poppins', sans-serif;   
   }
+  
   h3 {
     text-align: left;
     padding-top: 1em;
@@ -17,11 +19,15 @@ html, body {
     display: block;
   }
   .navbar{
-    background: #faf3f3;
-    color: #faf3f3;
-
     display: flex;
     justify-content: center;
+    width: 100%;
+    flex-wrap: wrap;
+    background: #faf3f3;
+    padding: 4px;
+    border-bottom-left-radius: 1em;
+    border-bottom-right-radius: 1em;
+    box-shadow: 0px 10px 15px rgba(0,0,0,0.1);
   }
   /* Navbar animation from https://codepen.io/maheshambure21/pen/QwXaRw */
   nav ul li a,
@@ -214,18 +220,22 @@ html, body {
 }
 
 .pagination ul{
+  position: fixed;
+  bottom: 0;
   width: 100%;
   display: flex;
   flex-wrap: wrap;
   background: #faf3f3;
-  padding: 8px;
-  border-radius: 50px;
+  padding: 4px;
+  margin: 0;
+  border-top-left-radius: 1em;
+  border-top-right-radius: 1em;
   box-shadow: 0px 10px 15px rgba(0,0,0,0.1);
 }
 .pagination ul li{
   color: #a7bbc7;
   list-style: none;
-  line-height: 45px;
+  line-height: 30px;
   text-align: center;
   font-size: 18px;
   font-weight: 500;
@@ -235,10 +245,10 @@ html, body {
 }
 .pagination ul li.numb{
   list-style: none;
-  height: 45px;
-  width: 45px;
+  height: 30px;
+  width: 30px;
   margin: 0 3px;
-  line-height: 45px;
+  line-height: 30px;
   border-radius: 50%;
 }
 .pagination ul li.numb.first{
@@ -424,6 +434,9 @@ span.circle {
 }
 
 .new_comment-form {
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
   width: 30em;
   background: #fff;
   border-radius: 1em;
@@ -433,8 +446,21 @@ span.circle {
 }
 .new_comment-form .form-control {
   padding: 1em;
+  display: flex;
+  flex-direction: row;
+  max-width: 100%;
+}
+.modal-buttons{
+  display: flex;
+  flex-direction: row;
+  max-width: 100%;
+  justify-content: center;
+  text-align: center;
 }
 .new_comment-form .btn{
+  display: flex;
+  flex-direction: row;
+  max-width: 100%;
   margin: 1em;
   padding: 0.5em;
   padding-left: 3em;

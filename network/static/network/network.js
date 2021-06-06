@@ -56,7 +56,9 @@ document.addEventListener("DOMContentLoaded", function () {
             .addEventListener("click", function () {
                 const section = this.dataset.section;
                 //history.pushState({section: section}, "", `${section}`);
-                load_profile(username);
+                setTimeout(() => {
+                    load_profile(username);
+                }, 250);
                 return false;
             });
     }
@@ -76,9 +78,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     .then((response) => response.json())
                     .then((result) => {
                         document.querySelector("#new_post-text").value = ""
-                        console.log(result);
+                        //console.log(result);
                         if (result["error"]) {
-                            console.log(result["error"]);
+                            //console.log(result["error"]);
                         } else {
                             load_posts("all", true);
                         }
@@ -208,21 +210,36 @@ document.addEventListener("DOMContentLoaded", function () {
             post_card_edit.style.display = "none"
         }
         post_card_like.addEventListener("click", () => {
-            if (post.likes.includes(username)){
-                like(post, post_filter, true)
-            } else {
-                like(post, post_filter, false)
+            if (isAuthenticated){
+                if (post.likes.includes(username)){
+                    like(post, post_filter, true)
+                } else {
+                    like(post, post_filter, false)
+                }  
+            }
+            else {
+                location.href = "/login"
             }
             
             return false;
         });
         post_card_comment.addEventListener("click", () => {
-            $(`#Modal${post.id}`).modal("show")
+            if (isAuthenticated){
+                $(`#Modal${post.id}`).modal("show") 
+            }
+            else {
+                location.href = "/login"
+            }
             return false;
         });
         
         post_card_displayname.addEventListener("click", function () {
-            load_profile(post.author);
+            if (isAuthenticated){
+                load_profile(post.author);
+            }
+            else {
+                location.href = "/login"
+            }
             return false;
         });
         // post_card_text.addEventListener("click", () => {
@@ -251,13 +268,17 @@ document.addEventListener("DOMContentLoaded", function () {
         post_modal.innerHTML = `
             <div class="modal-dialog">
                 <div class="modal-content">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close Comments</button>
                     <div class="modal-body">
                         ${post.id}
                     </div>
                     <form class="new_comment-form">
                         <h5>New Comment</h5>
                         <textarea maxlength="280" class="form-control comment" placeholder="Type here..."></textarea>
+                        <div class="modal-buttons">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="button" class="btn btn-primary" >Submit</button>
+                        </div>
                     </form>
                 </div>
             </div> 
@@ -283,9 +304,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                     .then((response) => response.json())
                     .then((result) => {
-                        console.log(result);
+                        //console.log(result);
                         if (result["error"]) {
-                            console.log(result["error"]);
+                            //console.log(result["error"]);
                         } else {
                             //TODO make the modal refresh with the new comment
                             $(`#Modal${post.id}`).modal('hide');
@@ -309,34 +330,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     "card__profile-img"
                 )[0].setAttribute("src", data["image"]); 
                 comments.forEach((comment) => {
-                    const comment_div = document.createElement("div");
-                    comment_div.innerHTML = post_card.innerHTML
-                    comment_div.getElementsByClassName("card__footer")[0].innerHTML = `replying to ${post.author}`
-                    const comment_div_displayname = comment_div.getElementsByClassName(
-                        "card__meta__displayname"
-                    )[0];
-                    const comment_div_username = comment_div.getElementsByClassName(
-                        "card__meta__username"
-                    )[0];
-                    const comment_div_timestamp = comment_div.getElementsByClassName(
-                        "card__meta__timestamp"
-                    )[0];
-                    const comment_div_text =
-                        comment_div.getElementsByClassName("card__body")[0];
-                    comment_div_displayname.innerHTML = `${comment.author}`;
-                    comment_div_username.innerHTML = `@${comment.author}`;
-                    comment_div_timestamp.innerHTML = `${comment.timestamp}`;
-                    comment_div_text.innerHTML = `${comment.text}`;
-                    comment_div.getElementsByClassName(
-                        "card__profile-img"
-                    )[0].setAttribute("src", `${comment.image}`); 
-
-                    comment_div_displayname.addEventListener("click", function () {
-                        console.log("somethinf")
-                        $(`#Modal${post.id}`).modal('hide');
-                        load_profile(comment.author);
-                        return false;
-                    });
+                    const comment_div = generate_comment_div(comment, post, post_card);
                     post_modal.getElementsByClassName("modal-body")[0].appendChild(comment_div)
                 })
         });
@@ -345,12 +339,43 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector("#posts-view").append(post_card);
     }
 
-        
+    function generate_comment_div(comment, post, post_card){
+        const comment_div = document.createElement("div");
+        comment_div.innerHTML = post_card.innerHTML
+        comment_div.getElementsByClassName("card__footer")[0].innerHTML = `replying to ${post.author}`
+        const comment_div_displayname = comment_div.getElementsByClassName(
+            "card__meta__displayname"
+        )[0];
+        const comment_div_username = comment_div.getElementsByClassName(
+            "card__meta__username"
+        )[0];
+        const comment_div_timestamp = comment_div.getElementsByClassName(
+            "card__meta__timestamp" //
+        )[0];
+        const comment_div_text =
+            comment_div.getElementsByClassName("card__body")[0];
+        comment_div_displayname.innerHTML = `${comment.author}`;
+        comment_div_username.innerHTML = `@${comment.author}`;
+        comment_div_timestamp.innerHTML = `${comment.timestamp}`;
+        comment_div_text.innerHTML = `${comment.text}`;
+        comment_div.getElementsByClassName(
+            "card__profile-img"
+        )[0].setAttribute("src", `${comment.image}`); 
+
+        comment_div_displayname.addEventListener("click", function () {
+            //console.log("somethinf")
+            $(`#Modal${post.id}`).modal('hide');
+            load_profile(comment.author);
+            return false;
+        });
+        return comment_div
+    }    
 
     function load_profile(profile) {
-        
+        console.log("something")
         // clear the profile-view
         document.querySelector("#profile-view").innerHTML = "";
+        document.querySelector("#posts-view").innerHTML = "";
         document.querySelector("#profile-view").style.display = "block";
 
         fetch(`/profile/${profile}`)
@@ -412,6 +437,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Load posts of the specified profile
                 load_posts(profile, true);
             });
+            return false
     }
 
     // Follow/Unfollow selected user
@@ -423,7 +449,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then((response) => response.json())
             .then((result) => {
-                console.log(result);
+                //console.log(result);
             });
             
         setTimeout(() => {
@@ -443,7 +469,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then((response) => response.json())
             .then((result) => {
-                console.log(result);
+                //console.log(result);
             });
             if (isLiked === false){
                 if (temp_liked === false){
@@ -492,7 +518,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                     .then((response) => response.json())
                     .then((result) => {
-                        console.log(result);
+                        //console.log(result);
                     });
                 post_card_text.innerHTML = `${post.text}`;
                 post_card_edit_submit.style.display = ("none")
@@ -504,15 +530,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
     }
 
-    // document.addEventListener("DOMContentLoaded", function () {
-    //     document.querySelectorAll("button").forEach((button) => {
-    //         button.onclick = function () {
-    //             const section = this.dataset.section;
-    //             //history.pushState({section: section}, "", `section${section}`);
-    //             showSection(section);
-    //         };
-    //     });
-    // });
     function generate_pagination(data, post_filter) {
         const pagination = document.createElement("div");
         pagination.setAttribute("class", "pagination");
@@ -546,7 +563,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const active_num = pagination.getElementsByClassName(
             `numb ${current_page}`
         )[0];
-        active_num.setAttribute("class", "numb active");
+        if (active_num){
+            active_num.setAttribute("class", "numb active");
+        }
 
         const first_numb = pagination.getElementsByClassName(
             "numb 1"
@@ -593,146 +612,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }  
         return pagination
-        return rangeWithDots;
-    }
-    function xgenerate_pagination(data, post_filter) {
-        // Pagination taken from https://codepen.io/fadzrinmadu/pen/KKWvYqW
-        const pagination = document.createElement("div");
-        pagination.setAttribute("class", "pagination");
-        // selecting required element
-        const pagination_ul = document.createElement("ul");
-    
-        let totalPages = data["num_pages"];
-        let page = current_page;
-    
-        let liTag = "";
-        let active;
-        let beforePage = page - 1;
-        let afterPage = page + 1;
-        if (page > 1) {
-            //show the next button if the page value is greater than 1
-            liTag += `<li class="btn prev"><span><i class="fas fa-angle-left"></i> Prev</span></li>`;
-        }
-        if (page > 1) {
-            //if page value is less than 2 then add 1 after the previous button
-            liTag += `<li class="first numb""><span>1</span></li>`;
-            if (page > 3) {
-                //if page value is greater than 3 then add this (...) after the first li or page
-                liTag += `<li class="dots"><span>...</span></li>`;
-            }
-        }
-        // how many pages or li show before the current li
-        if (page == totalPages) {
-            beforePage = beforePage - 2;
-        } else if (page == totalPages - 1) {
-            beforePage = beforePage - 1;
-        }
-        // how many pages or li show after the current li
-        if (page == 1) {
-            afterPage = afterPage + 2;
-        } else if (page == 2) {
-            afterPage = afterPage + 1;
-        }
-
-        for (var plength = beforePage; plength < afterPage; plength++) {
-            if (plength > totalPages) {
-                //if plength is greater than totalPage length then continue
-                continue;
-            }
-            if (plength == 0 ) {
-                //if plength is 0 than add +1 in plength value
-                plength = plength + 1;tive = "";
-            }
-            liTag += `<li class="numb ${plength}"><span>${plength}</span></li>`;
-        }
-
-        if (page < totalPages - 1) {
-            //if page value is less than totalPage value by -1 then show the last li or page
-            if (page < totalPages - 2) {
-                //if page value is less than totalPage value by -2 then add this (...) before the last li or page
-                liTag += `<li class="dots"><span>...</span></li>`;
-            }
-            liTag += `<li class="last numb"><span>${totalPages}</span></li>`;
-        }
-
-        if (page < totalPages) {
-            //show the next button if the page value is less than totalPage(20)
-            liTag += `<li class="btn next"><span>Next <i class="fas fa-angle-right"></i></span></li>`;
-        }
-        pagination_ul.innerHTML = liTag; //add li tag inside ul tag
-        pagination.appendChild(pagination_ul);
-
-        const active_num = pagination.getElementsByClassName(
-            `${current_page}`
-        )[0];
-        active_num.setAttribute("class", "numb active");
-
-        const btn_next = pagination.getElementsByClassName(
-            "btn next"
-        )[0];
-        if (btn_next){
-            btn_next.addEventListener("click", function () {
-                current_page++
-                load_posts(post_filter, false)
-                return false;
-            });
-        }
-        const btn_prev = pagination.getElementsByClassName(
-            "btn prev"
-        )[0];
-        if (btn_prev){
-            btn_prev.addEventListener("click", function () {
-                current_page--
-                load_posts(post_filter, false)
-                return false;
-            });
-        }
-        const first_numb = pagination.getElementsByClassName(
-            "first numb"
-        )[0];
-        if (first_numb){
-            first_numb.addEventListener("click", function () {
-                current_page = 1
-                load_posts(post_filter, false)
-                return false;
-            });
-        }
-        const last_numb = pagination.getElementsByClassName(
-            "last numb"
-        )[0];
-        if (last_numb){
-            last_numb.addEventListener("click", function () {
-                current_page = totalPages
-                load_posts(post_filter, false)
-                return false;
-            });
-        }
-        for (let i = 1; i < 4; i++){
-            const plus_numb = pagination.getElementsByClassName(
-                `numb ${current_page + i}`
-            )[0];
-            if (plus_numb){
-                plus_numb.addEventListener("click", function () {
-                    current_page = current_page + i
-                    load_posts(post_filter, false)
-                    return false;
-                });
-            }
-        }
-        for (let i = current_page; i > current_page - 4; i--){
-            const minus_numb = pagination.getElementsByClassName(
-                `numb ${i}`
-            )[0];
-            if (minus_numb){
-                minus_numb.addEventListener("click", function () {
-                    current_page = i
-                    load_posts(post_filter, false)
-                    return false;
-                });
-            }
-        }  
-        return pagination
-
     }
 });
 
