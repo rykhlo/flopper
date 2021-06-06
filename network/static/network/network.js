@@ -597,7 +597,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const plus_numb = pagination.getElementsByClassName(
                 `numb ${current_page + i}`
             )[0];
-            if (plus_numb){
+            if (plus_numb && current_page + i != 1 && current_page + i != last){
                 plus_numb.addEventListener("click", function () {
                     current_page = current_page + i
                     load_posts(post_filter, false)
@@ -609,7 +609,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const minus_numb = pagination.getElementsByClassName(
                 `numb ${i}`
             )[0];
-            if (minus_numb){
+            if (minus_numb && i != 1 && i != last){
                 minus_numb.addEventListener("click", function () {
                     current_page = i
                     load_posts(post_filter, false)
