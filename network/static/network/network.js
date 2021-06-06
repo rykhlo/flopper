@@ -537,6 +537,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function generate_pagination(data, post_filter) {
+        console.log(current_page)
         const pagination = document.createElement("div");
         pagination.setAttribute("class", "pagination");
         // selecting required element
@@ -571,33 +572,7 @@ document.addEventListener("DOMContentLoaded", function () {
         pagination_ul.innerHTML = liTag; //add li tag inside ul tag
         pagination.appendChild(pagination_ul);
 
-        const active_num = pagination.getElementsByClassName(
-            `numb ${current_page}`
-        )[0];
-        if (active_num){
-            active_num.setAttribute("class", "numb active");
-        }
-
-        const first_numb = pagination.getElementsByClassName(
-            "numb 1"
-        )[0];
-        if (first_numb){
-            first_numb.addEventListener("click", function () {
-                current_page = 1
-                load_posts(post_filter, false)
-                return false;
-            });
-        }
-        const last_numb = pagination.getElementsByClassName(
-            `numb ${last}`
-        )[0];
-        if (last_numb){
-            last_numb.addEventListener("click", function () {
-                current_page = last
-                load_posts(post_filter, false)
-                return false;
-            });
-        }
+    
         const btn_next = pagination.getElementsByClassName(
             "btn next"
         )[0];
@@ -641,7 +616,33 @@ document.addEventListener("DOMContentLoaded", function () {
                     return false;
                 });
             }
-        }  
+        }
+        const first_numb = pagination.getElementsByClassName(
+            "numb 1"
+        )[0];
+        if (first_numb){
+            first_numb.addEventListener("click", function () {
+                current_page = 1
+                load_posts(post_filter, false)
+                return false;
+            });
+        }
+        const last_numb = pagination.getElementsByClassName(
+            `numb ${last}`
+        )[0];
+        if (last_numb){
+            last_numb.addEventListener("click", function () {
+                current_page = last
+                load_posts(post_filter, false)
+                return false;
+            });
+        }
+        const active_num = pagination.getElementsByClassName(
+            `numb ${current_page}`
+        )[0];
+        if (active_num){
+            active_num.setAttribute("class", "numb active");
+        }
         return pagination
     }
 });
