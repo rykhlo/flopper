@@ -540,23 +540,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
         var current = current_page,
             last = data["num_pages"],
-            delta = 2,
+            delta = 1,
             left = current - delta,
             right = current + delta + 1,
-            range = [],
-            rangeWithDots = [],
-            l;
-    
+            range = [];
+        
+        if (current > 1) {
+            liTag += `<li class="btn prev"><span><i class="fas fa-angle-left"></i></span></li>`;
+        }
         for (let i = 1; i <= last; i++) {
             if (i == 1 || i == last || i >= left && i < right) {
                 range.push(i);
-                if (i === last){
-                    liTag += `<li class="numb ${last}"><span>${last}</span></li>`;
-                }
-                else {
-                    liTag += `<li class="numb ${i}"><span>${i}</span></li>`;
-                }
+                liTag += `<li class="numb ${i}"><span>${i}</span></li>`;               
             }
+            if (i == current - delta - 2){
+                liTag += `<li class="dots"><span>...</span></li>`;
+            }
+            if (i == current + 2 && right != last && i != last){
+                liTag += `<li class="dots"><span>...</span></li>`;
+            }
+        }
+        if (current < last) {
+            liTag += `<li class="btn next"><span><i class="fas fa-angle-right"></i></span></li>`;
         }
         pagination_ul.innerHTML = liTag; //add li tag inside ul tag
         pagination.appendChild(pagination_ul);
@@ -584,6 +589,26 @@ document.addEventListener("DOMContentLoaded", function () {
         if (last_numb){
             last_numb.addEventListener("click", function () {
                 current_page = last
+                load_posts(post_filter, false)
+                return false;
+            });
+        }
+        const btn_next = pagination.getElementsByClassName(
+            "btn next"
+        )[0];
+        if (btn_next){
+            btn_next.addEventListener("click", function () {
+                current_page++
+                load_posts(post_filter, false)
+                return false;
+            });
+        }
+        const btn_prev = pagination.getElementsByClassName(
+            "btn prev"
+        )[0];
+        if (btn_prev){
+            btn_prev.addEventListener("click", function () {
+                current_page--
                 load_posts(post_filter, false)
                 return false;
             });
