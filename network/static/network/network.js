@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         I have a bad feeling about this!
                     </div>
                     <div class="card__footer">
-                        <span class="card__footer__like" id="card__footer__like#${post.id}">
+                        <span class="card__footer__like_templiked#0" id="like#${post.id}">
                         <i class="far fa-heart"></i> 134
                         </span>
                         <span class="card__footer__comment">
@@ -191,7 +191,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "card__footer__comment"
         )[0];
         const post_card_like = post_card.getElementsByClassName(
-            "card__footer__like"
+            "card__footer__like_templiked#0"
         )[0];
         const post_card_edit = post_card.getElementsByClassName(
             "card__footer__edit"
@@ -472,26 +472,31 @@ document.addEventListener("DOMContentLoaded", function () {
             .then((result) => {
                 //console.log(result);
             });
-            if (isLiked === false){
-                if (temp_liked === false){
-                    document.getElementById(`card__footer__like#${post.id}`).innerHTML = `<i class="fas fa-heart"></i> ${post.likes.length+1}`;
-                    temp_liked = true;
+            if (!isLiked){
+                //if templiked variable is false
+                if (document.getElementById(`like#${post.id}`).className === "card__footer__like_templiked#0"){
+                    document.getElementById(`like#${post.id}`).innerHTML = `<i class="fas fa-heart"></i> ${post.likes.length+1}`;
+                    //set templiked to true
+                    document.getElementById(`like#${post.id}`).className = "card__footer__like_templiked#1"
                 }
                 else {
-                    document.getElementById(`card__footer__like#${post.id}`).innerHTML = `<i class="far fa-heart"></i> ${post.likes.length}`;
-                    temp_liked = false;
+                    document.getElementById(`like#${post.id}`).innerHTML = `<i class="far fa-heart"></i> ${post.likes.length}`;
+                    //set templiked to falses
+                    document.getElementById(`like#${post.id}`).className = "card__footer__like_templiked#0"
                 }
-            }
+            } 
             else {
-                if (temp_liked === false){
-                    document.getElementById(`card__footer__like#${post.id}`).innerHTML = `<i class="far fa-heart"></i> ${post.likes.length-1}`;
-                    temp_liked = true;
+                if (document.getElementById(`like#${post.id}`).className === "card__footer__like_templiked#0"){
+                    document.getElementById(`like#${post.id}`).innerHTML = `<i class="far fa-heart"></i> ${post.likes.length-1}`;
+                    //set templiked to true
+                    document.getElementById(`like#${post.id}`).className = "card__footer__like_templiked#1"
                 }
                 else {
-                    document.getElementById(`card__footer__like#${post.id}`).innerHTML = `<i class="fas fa-heart"></i> ${post.likes.length}`;
-                    temp_liked = false;
-                }             
+                    document.getElementById(`like#${post.id}`).innerHTML = `<i class="fas fa-heart"></i> ${post.likes.length}`;
+                    document.getElementById(`like#${post.id}`).className = "card__footer__like_templiked#0"
+                }
             }
+                
 
             
 
