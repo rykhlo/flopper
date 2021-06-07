@@ -8,7 +8,7 @@ CS50 Web Project 4 Network. Design a Twitter-like social network website for mak
 
 *OpenCourseWare CS50’s Web Programming with Python and JavaScript*
 
-https://cs50.harvard.edu/web/2020/projects/3/mail
+https://cs50.harvard.edu/web/2020/projects/4/network
 
 ### Specification
 
