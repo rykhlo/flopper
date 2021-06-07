@@ -26,8 +26,6 @@ https://cs50.harvard.edu/web/2020/projects/3/mail
 - **Edit Post**: Users can click on edit button to edit any of their posts.
 
 - **“Like” and “Unlike”**: Users can click a button on any post to toggle whether or not they “like” that post.
-- ---------
 
 - **Not required by the cs50 course**: 
   - **Comments** : Signed in users are able to leave a comment on post of any other user. 
-------
