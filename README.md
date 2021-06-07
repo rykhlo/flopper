@@ -29,3 +29,8 @@ https://cs50.harvard.edu/web/2020/projects/4/network
 
 - **Not required by the cs50 course**: 
   - **Comments** : Signed in users are able to leave a comment on post of any other user. 
+
+----
+- **CodePens used for UI** :
+   - Post Card https://codepen.io/markbaker/pen/QWbQVKo
+   - Pagination https://codepen.io/fadzrinmadu/pen/KKWvYqW
